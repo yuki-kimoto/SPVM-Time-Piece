@@ -3,4 +3,90 @@
 
 class Time::Seconds {
   
+  # Fields
+  has seconds : double;
+  
+  # Class Methods
+  static method new : Time::Seconds ($second : double = 0) {
+    
+    my $self = new Time::Seconds;
+    
+    $self->{seconds} = $second;
+    
+    return $self;
+  }
+  
+  static method ONE_MINUTE : double () { return 60d; }
+  
+  static method ONE_HOUR : double () { return 3_600d; }
+  
+  static method ONE_DAY : double () { return 86_400d; }
+  
+  static method ONE_WEEK : double () { return 604_800d; }
+  
+  static method ONE_MONTH : double () { return 2_629_744d; } # ONE_YEAR / 12
+  
+  static method ONE_YEAR : double () { return 31_556_930d; } # 365.24225 days
+  
+  static method ONE_FINANCIAL_MONTH : double () { return 2_592_000d; } # 30 days
+  
+  static method LEAP_YEAR : double () { return 31_622_400d; } # 366 * ONE_DAY
+  
+  static method NON_LEAP_YEAR : double () { return 31_536_000d; } # 365 * ONE_DAY
+  
+  # Instance Methods
+  method add : Time::Seconds ($seconds : double) {
+    
+    my $new_seconds = $self->{seconds} + $seconds;
+    
+    return Time::Seconds->new($new_seconds);
+  }
+  
+  method add_to : void ($seconds : double) {
+    $self->{seconds} += $seconds;
+  }
+  
+  method subtract : Time::Seconds ($seconds : double) {
+    
+    my $new_seconds = $self->{seconds} - $seconds;
+    
+    return Time::Seconds->new($new_seconds);
+  }
+  
+  method subtract_from : void ($seconds : double) {
+    $self->{seconds} -= $seconds;
+  }
+  
+  method copy : Time::Seconds {
+    return Time::Seconds->new($self->{seconds});
+  }
+  
+  method minutes : double {
+    return $self->{seconds} / 60;
+  }
+  
+  method hours : double () {
+    return $self->minutes / 60;
+  }
+   
+  method days : double () {
+    return $self->hours / 24;
+  }
+   
+  method weeks : double () {
+    return $self->days / 7;
+  }
+   
+  method months : double () {
+    return $self->days / 30.4368541;
+  }
+   
+  method financial_months () : double {
+    return  $self->days / 30;
+  }
+  
+  method years : double () {
+    return ($self->days / 365.24225);
+  }
+  
 }
