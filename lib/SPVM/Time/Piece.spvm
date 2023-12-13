@@ -7,6 +7,7 @@ class Time::Piece {
   use Time::Seconds;
   use Time::Local;
   use Sys::Time::Tm;
+  use Math;
   
   # Class Variables
   our $DATE_SEP : string;
@@ -516,45 +517,10 @@ class Time::Piece {
       return scalar $self->_mktime(\@vals, $islocal);
   }
 
-  method time_separator {
-      shift if ref($_[0]) && $_[0]->isa(__PACKAGE__);
-      my $old = $TIME_SEP;
-      if (@_) {
-          $TIME_SEP = $_[0];
-      }
-      return $old;
-  }
-
-  method date_separator {
-      shift if ref($_[0]) && $_[0]->isa(__PACKAGE__);
-      my $old = $DATE_SEP;
-      if (@_) {
-          $DATE_SEP = $_[0];
-      }
-      return $old;
-  }
-
-  use overload '""' => \&cdate,
-               'cmp' => \&str_compare,
-               'fallback' => undef;
-
-  method cdate {
-      
-      if ($self->{islocal}) {
-          return scalar(CORE::localtime($self->epoch));
-      }
-      else {
-          return scalar(CORE::gmtime($self->epoch));
-      }
-  }
-
-  method str_compare {
-      my ($lhs, $rhs, $reverse) = @_;
-
-      if (blessed($rhs) && $rhs->isa('Time::Piece')) {
-          $rhs = "$rhs";
-      }
-      return $reverse ? $rhs cmp $lhs->cdate : $lhs->cdate cmp $rhs;
+  method cdate : string () {
+    
+    return $self->strftime("%a %b %d %H:%M:%S %Y", 
+    
   }
   
   method subtract : Time::Piece ($rhs : Time::Seconds) {
@@ -562,64 +528,57 @@ class Time::Piece {
     return $self->_mktime(($self->epoch - $rhs->{seconds}), $self->{islocal});
   }
   
-  method add {
+  method add : Time::Piece ($rhs : Time::Seconds) {
+    
+    return $self->_mktime(($self->epoch + $rhs), $self->{islocal});
+  }
+  
+  method compare : int ($lhs : Time::Piece, $rhs : Time::Piece) {
+    return $lhs->{epoch} <=> $rhs->{epoch};
+  }
+  
+  method _mini_mktime : 
+  
+  method add_months : void ($num_months : int) {
+    
+    unless ($num_months) {
+      die "\$num_months must be defined.";
+    }
+    
+    my $final_month = $self->_mon + $num_months;
+    my $num_years = 0;
+    if ($final_month > 11 || $final_month < 0) {
+      if ($final_month < 0 && $final_month % 12 == 0) {
+        $num_years = int($final_month / 12) + 1;
+      }
+      else {
+        $num_years = int($final_month / 12);
+      }
+      $num_years-- if ($final_month < 0);
       
-      my $rhs = shift;
-
-      return $self->_mktime(($self->epoch + $rhs), $self->{islocal});
+      $final_month = $final_month % 12;
+    }
+    
+    my $current_tm = $self->{tm};
+    
+    my $ret_tm = Sys->gmtime(0);
+    
+    $ret_tm->set_tm_sec($current_tm->sec);
+    $ret_tm->set_tm_min($current_tm->min);
+    $ret_tm->set_tm_hour($current_tm->hour);
+    $ret_tm->set_tm_mday($current_tm->mday);
+    $ret_tm->set_tm_mon($final_month);
+    $ret_tm->set_tm_year( $current_tm->year - 1900 + $num_years);
+    
+    my $ret_epoch = Time::Local->timelocal($ret_tm);
+    
+    return scalar $self->_mktime($ret_epoch, $self->{islocal});
   }
-
-  use overload
-          '<=>' => \&compare;
-
-  method get_epochs {
-      my ($lhs, $rhs, $reverse) = @_;
-      unless (blessed($rhs) && $rhs->isa('Time::Piece')) {
-          $rhs = $lhs->new($rhs);
-      }
-      if ($reverse) {
-          return $rhs->epoch, $lhs->epoch;
-      }
-      return $lhs->epoch, $rhs->epoch;
+  
+  method add_years : void ($years : int) {
+    $self->add_months($years * 12);
   }
-
-  method compare {
-      my ($lhs, $rhs) = get_epochs(@_);
-      return $lhs <=> $rhs;
-  }
-
-  method add_months {
-      my ($time, $num_months) = @_;
-
-      croak("add_months requires a number of months") unless defined($num_months);
-
-      my $final_month = $self->_mon + $num_months;
-      my $num_years = 0;
-      if ($final_month > 11 || $final_month < 0) {
-          # these two ops required because we have no POSIX::floor and don't
-          # want to load POSIX.pm
-          if ($final_month < 0 && $final_month % 12 == 0) {
-              $num_years = int($final_month / 12) + 1;
-          }
-          else {
-              $num_years = int($final_month / 12);
-          }
-          $num_years-- if ($final_month < 0);
-
-          $final_month = $final_month % 12;
-      }
-
-      my @vals = _mini_mktime($self->sec, $self->min, $self->hour,
-                              $self->mday, $final_month, $self->year - 1900 + $num_years);
-      # warn(Format->sprintf("got %d vals: %d-%d-%d %d:%d:%d [%d]\n", scalar(@vals), reverse(@vals), $self->{islocal}));
-      return scalar $self->_mktime(\@vals, $self->{islocal});
-  }
-
-  method add_years {
-      my ($time, $years) = @_;
-      $self->add_months($years * 12);
-  }
-
+  
   method truncate {
       my ($time, %params) = @_;
       return $time unless exists $params{to};
