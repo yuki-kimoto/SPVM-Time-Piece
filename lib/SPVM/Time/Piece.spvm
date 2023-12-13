@@ -388,12 +388,17 @@ class Time::Piece {
   
   method month_last_day {
     
-    my @MON_LAST = qw(31 28 31 30 31 30 31 31 30 31 30 31);
+    my $MON_LAST = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
     
     my $year = $self->year;
     my $_mon = $self->_mon;
     
-    return $MON_LAST->[$_mon] + ($_mon == 1 ? _is_leap_year($year) : 0);
+    my $add_leap_year = 0;
+    if ($_mon == 1) {
+      $add_leap_year = &_is_leap_year($year)
+    }
+    
+    return $MON_LAST->[$_mon] + $add_leap_year;
   }
   
   native method strftime : string ($format : string);
