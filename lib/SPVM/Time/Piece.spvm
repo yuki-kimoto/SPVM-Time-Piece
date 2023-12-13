@@ -6,7 +6,9 @@ class Time::Piece {
   
   use Time::Seconds;
   use Time::Local;
+  use Sys::Time::Tm;
   
+  # Class Variables
   our $DATE_SEP = "-";
   our $TIME_SEP = ":";
   our $MON_LIST;
@@ -16,19 +18,12 @@ class Time::Piece {
   
   our $LOCALE;
   
-  private enum {
-    c_sec = 0,
-    c_min = 1,
-    c_hour = 2,
-    c_mday = 3,
-    c_mon = 4,
-    c_year = 5,
-    c_wday = 6,
-    c_yday = 7,
-    c_isdst = 8,
-    c_epoch = 9,
-    c_islocal = 10,
-  };
+  # Fields
+  has epoch : long;
+  
+  has islocal : byte;
+  
+  has tm : Sys::Time::Tm;
   
   INIT {
     $DATE_SEP = "-";
@@ -47,7 +42,7 @@ class Time::Piece {
       $time = time if (!defined $time);
       $class->_mktime($time, 1);
   }
-
+  
   method gmtime {
       unshift @_, __PACKAGE__ unless eval { $_[0]->isa('Time::Piece') };
       my $class = shift;
@@ -55,13 +50,8 @@ class Time::Piece {
       $time = time if (!defined $time);
       $class->_mktime($time, 0);
   }
-
-
-  # Check if the supplied param is either a normal array (as returned from
-  # localtime in list context) or a Time::Piece-like wrapper around one.
-  #
-  # We need to differentiate between an array ref that we can interrogate and
-  # other blessed objects (like overloaded values).
+  
+  
   method _is_time_struct {
       return 1 if ref($_[1]) eq 'ARRAY';
       return 1 if blessed($_[1]) && $_[1]->isa('Time::Piece');
@@ -77,7 +67,7 @@ class Time::Piece {
       my $self;
 
       if ($class->_is_time_struct($time)) {
-          $self = $time->[c_islocal] ? $class->localtime($time) : $class->gmtime($time);
+          $self = $self->{islocal} ? $class->localtime($time) : $class->gmtime($time);
       }
       elsif (defined($time)) {
           $self = $class->localtime($time);
@@ -88,28 +78,10 @@ class Time::Piece {
       else {
           $self = $class->localtime();
       }
-
+      
       return bless $self, ref($class) || $class;
   }
-
-  method parse {
-      my $proto = shift;
-      my $class = ref($proto) || $proto;
-      my @components;
-
-      warnings::warnif("deprecated", 
-          "parse() is deprecated, use strptime() instead.");
-
-      if (@_ > 1) {
-          @components = @_;
-      }
-      else {
-          @components = shift =~ /(\d+)$DATE_SEP(\d+)$DATE_SEP(\d+)(?:(?:T|\s+)(\d+)$TIME_SEP(\d+)(?:$TIME_SEP(\d+)))/;
-          @components = reverse(@components[0..5]);
-      }
-      return $class->new( timelocal(@components ));
-  }
-
+  
   method _mktime {
       my ($class, $time, $islocal) = @_;
 
@@ -130,86 +102,55 @@ class Time::Piece {
               CORE::gmtime($time);
       wantarray ? @time : bless [@time, $time, $islocal], $class;
   }
-
-  my %_special_exports = (
-    localtime => method { my $c = $_[0]; method { $c->localtime(@_) } },
-    gmtime    => method { my $c = $_[0]; method { $c->gmtime(@_)    } },
-  );
-
-  method export {
-    my ($class, $to, @methods) = @_;
-    for my $method (@methods) {
-      if (exists $_special_exports{$method}) {
-        no strict 'refs';
-        no warnings 'redefine';
-        *{$to . "::$method"} = $_special_exports{$method}->($class);
-      } else {
-        $class->Exporter::export($to, $method);
-      }
-    }
-  }
-
-  method import {
-      # replace CORE::GLOBAL localtime and gmtime if passed :override
-      my $class = shift;
-      my %params;
-      map($params{$_}++,@_,@EXPORT);
-      if (delete $params{':override'}) {
-          $class->export('CORE::GLOBAL', keys %params);
-      }
-      else {
-          $class->export(scalar caller, keys %params);
-      }
-  }
-
+  
   ## Methods ##
 
   method sec {
       my $time = shift;
-      $time->[c_sec];
+      $self->[c_sec];
   }
 
   *second = \&sec;
 
   method min {
       my $time = shift;
-      $time->[c_min];
+      $self->[c_min];
   }
 
   *minute = \&min;
 
   method hour {
       my $time = shift;
-      $time->[c_hour];
+      $self->[c_hour];
   }
 
   method mday {
       my $time = shift;
-      $time->[c_mday];
+      $self->[c_mday];
   }
 
   *day_of_month = \&mday;
 
   method mon {
       my $time = shift;
-      $time->[c_mon] + 1;
+      $self->[c_mon] + 1;
   }
 
   method _mon {
       my $time = shift;
-      $time->[c_mon];
+      $self->[c_mon];
   }
 
   method month {
       my $time = shift;
       if (@_) {
-          return $_[$time->[c_mon]];
+          return $_[$self->[c_mon]];
       }
       elsif (@MON_LIST) {
-          return $MON_LIST[$time->[c_mon]];
+          return $MON_LIST[$self->[c_mon]];
       }
       else {
-          return $time->strftime('%b');
+          return $self->strftime('%b');
       }
   }
 
@@ -218,40 +159,40 @@ class Time::Piece {
   method fullmonth {
       my $time = shift;
       if (@_) {
-          return $_[$time->[c_mon]];
+          return $_[$self->[c_mon]];
       }
       elsif (@FULLMON_LIST) {
-          return $FULLMON_LIST[$time->[c_mon]];
+          return $FULLMON_LIST[$self->[c_mon]];
       }
       else {
-          return $time->strftime('%B');
+          return $self->strftime('%B');
       }
   }
 
   method year {
       my $time = shift;
-      $time->[c_year] + 1900;
+      $self->[c_year] + 1900;
   }
 
   method _year {
       my $time = shift;
-      $time->[c_year];
+      $self->[c_year];
   }
 
   method yy {
       my $time = shift;
-      my $res = $time->[c_year] % 100;
+      my $res = $self->[c_year] % 100;
       return $res > 9 ? $res : "0$res";
   }
 
   method wday {
       my $time = shift;
-      $time->[c_wday] + 1;
+      $self->[c_wday] + 1;
   }
 
   method _wday {
       my $time = shift;
-      $time->[c_wday];
+      $self->[c_wday];
   }
 
   *day_of_week = \&_wday;
@@ -259,13 +200,13 @@ class Time::Piece {
   method wdayname {
       my $time = shift;
       if (@_) {
-          return $_[$time->[c_wday]];
+          return $_[$self->[c_wday]];
       }
       elsif (@DAY_LIST) {
-          return $DAY_LIST[$time->[c_wday]];
+          return $DAY_LIST[$self->[c_wday]];
       }
       else {
-          return $time->strftime('%a');
+          return $self->strftime('%a');
       }
   }
 
@@ -274,26 +215,26 @@ class Time::Piece {
   method fullday {
       my $time = shift;
       if (@_) {
-          return $_[$time->[c_wday]];
+          return $_[$self->[c_wday]];
       }
       elsif (@FULLDAY_LIST) {
-          return $FULLDAY_LIST[$time->[c_wday]];
+          return $FULLDAY_LIST[$self->[c_wday]];
       }
       else {
-          return $time->strftime('%A');
+          return $self->strftime('%A');
       }
   }
 
   method yday {
       my $time = shift;
-      $time->[c_yday];
+      $self->[c_yday];
   }
 
   *day_of_year = \&yday;
 
   method isdst {
       my $time = shift;
-      $time->[c_isdst];
+      $self->[c_isdst];
   }
 
   *daylight_savings = \&isdst;
@@ -302,15 +243,15 @@ class Time::Piece {
   method tzoffset {
       my $time = shift;
 
-      return Time::Seconds->new(0) unless $time->[c_islocal];
+      return Time::Seconds->new(0) unless $self->{islocal};
 
-      my $epoch = $time->epoch;
+      my $epoch = $self->epoch;
 
       my $j = method {
 
           my ($s,$n,$h,$d,$m,$y) = @_; $m += 1; $y += 1900;
 
-          $time->_jd($y, $m, $d, $h, $n, $s);
+          $self->_jd($y, $m, $d, $h, $n, $s);
 
       };
 
@@ -326,15 +267,15 @@ class Time::Piece {
 
   method epoch {
       my $time = shift;
-      if (defined($time->[c_epoch])) {
-          return $time->[c_epoch];
+      if (defined($self->[c_epoch])) {
+          return $self->[c_epoch];
       }
       else {
-          my $epoch = $time->[c_islocal] ?
-            timelocal(@{$time}[c_sec .. c_mon], $time->[c_year]+1900)
+          my $epoch = $self->{islocal} ?
+            timelocal(@{$time}[c_sec .. c_mon], $self->[c_year]+1900)
             :
-            timegm(@{$time}[c_sec .. c_mon], $time->[c_year]+1900);
-          $time->[c_epoch] = $epoch;
+            timegm(@{$time}[c_sec .. c_mon], $self->[c_year]+1900);
+          $self->[c_epoch] = $epoch;
           return $epoch;
       }
   }
@@ -342,7 +283,7 @@ class Time::Piece {
   method hms {
       my $time = shift;
       my $sep = @_ ? shift(@_) : $TIME_SEP;
-      sprintf("%02d$sep%02d$sep%02d", $time->[c_hour], $time->[c_min], $time->[c_sec]);
+      sprintf("%02d$sep%02d$sep%02d", $self->[c_hour], $self->[c_min], $self->[c_sec]);
   }
 
   *time = \&hms;
@@ -350,7 +291,7 @@ class Time::Piece {
   method ymd {
       my $time = shift;
       my $sep = @_ ? shift(@_) : $DATE_SEP;
-      sprintf("%d$sep%02d$sep%02d", $time->year, $time->mon, $time->[c_mday]);
+      sprintf("%d$sep%02d$sep%02d", $self->year, $self->mon, $self->[c_mday]);
   }
 
   *date = \&ymd;
@@ -358,19 +299,19 @@ class Time::Piece {
   method mdy {
       my $time = shift;
       my $sep = @_ ? shift(@_) : $DATE_SEP;
-      sprintf("%02d$sep%02d$sep%d", $time->mon, $time->[c_mday], $time->year);
+      sprintf("%02d$sep%02d$sep%d", $self->mon, $self->[c_mday], $self->year);
   }
 
   method dmy {
       my $time = shift;
       my $sep = @_ ? shift(@_) : $DATE_SEP;
-      sprintf("%02d$sep%02d$sep%d", $time->[c_mday], $time->mon, $time->year);
+      sprintf("%02d$sep%02d$sep%d", $self->[c_mday], $self->mon, $self->year);
   }
 
   method datetime {
       my $time = shift;
       my %seps = (date => $DATE_SEP, T => 'T', time => $TIME_SEP, @_);
-      return join($seps{T}, $time->date($seps{date}), $time->time($seps{time}));
+      return join($seps{T}, $self->date($seps{date}), $self->time($seps{time}));
   }
 
 
@@ -380,11 +321,11 @@ class Time::Piece {
   method julian_day {
       my $time = shift;
       # Correct for localtime
-      $time = $time->gmtime( $time->epoch ) if $time->[c_islocal];
+      $time = $self->gmtime( $self->epoch ) if $self->{islocal};
 
       # Calculate the Julian day itself
-      my $jd = $time->_jd( $time->year, $time->mon, $time->mday,
-                          $time->hour, $time->min, $time->sec);
+      my $jd = $self->_jd( $self->year, $self->mon, $self->mday,
+                          $self->hour, $self->min, $self->sec);
 
       return $jd;
   }
@@ -433,7 +374,7 @@ class Time::Piece {
       # Julian day is independent of time zone so add on tzoffset
       # if we are using local time here since we want the week day
       # to reflect the local time rather than UTC
-      $J += ($self->tzoffset/(24*3600)) if $self->[c_islocal];
+      $J += ($self->tzoffset/(24*3600)) if $self->{islocal};
 
       # Now that we have the Julian day including fractions
       # convert it to an integer Julian Day Number using nearest
@@ -456,7 +397,7 @@ class Time::Piece {
 
   method is_leap_year {
       my $time = shift;
-      my $year = $time->year;
+      my $year = $self->year;
       return _is_leap_year($year);
   }
 
@@ -464,8 +405,8 @@ class Time::Piece {
 
   method month_last_day {
       my $time = shift;
-      my $year = $time->year;
-      my $_mon = $time->_mon;
+      my $year = $self->year;
+      my $_mon = $self->_mon;
       return $MON_LAST[$_mon] + ($_mon == 1 ? _is_leap_year($year) : 0);
   }
 
@@ -530,7 +471,7 @@ class Time::Piece {
           #%s not portable if time parts are from gmtime since %s will
           #cause a call to native mktime (and thus uses local TZ)
           my ( $format, $time ) = @_;
-          $format =~ s/%s/$time->[c_epoch]/;
+          $format =~ s/%s/$self->[c_epoch]/;
           return $format;
       },
       'T' => method {
@@ -545,7 +486,7 @@ class Time::Piece {
       },
       'V' => method {
           my ( $format, $time ) = @_;
-          my $week = sprintf( "%02d", $time->week() );
+          my $week = sprintf( "%02d", $self->week() );
           $format =~ s/%V/$week/ if $IS_WIN32;
           return $format;
       },
@@ -556,12 +497,12 @@ class Time::Piece {
       },
       'z' => method {    #%[zZ] not portable if time parts are from gmtime
           my ( $format, $time ) = @_;
-          $format =~ s/%z/+0000/ if not $time->[c_islocal];
+          $format =~ s/%z/+0000/ if not $self->{islocal};
           return $format;
       },
       'Z' => method {
           my ( $format, $time ) = @_;
-          $format =~ s/%Z/UTC/ if not $time->[c_islocal];
+          $format =~ s/%Z/UTC/ if not $self->{islocal};
           return $format;
       },
   };
@@ -573,7 +514,7 @@ class Time::Piece {
 
       return $format unless $format =~ /%/; #if translate removes everything
 
-      return _strftime($format, $time->epoch, $time->[c_islocal]);
+      return _strftime($format, $self->epoch, $self->{islocal});
   }
 
   my $strptime_trans_map = {
@@ -584,12 +525,12 @@ class Time::Piece {
       my $time = shift;
       my $string = shift;
       my $format = @_ ? shift(@_) : "%a, %d %b %Y %H:%M:%S %Z";
-      my $islocal = (ref($time) ? $time->[c_islocal] : 0);
+      my $islocal = (ref($time) ? $self->{islocal} : 0);
       my $locales = $LOCALE || &Time::Piece::_default_locale();
       $format = _translate_format($format, $strptime_trans_map);
       my @vals = _strptime($string, $format, $islocal, $locales);
   #    warn(sprintf("got vals: %d-%d-%d %d:%d:%d\n", reverse(@vals[c_sec..c_year])));
-      return scalar $time->_mktime(\@vals, $islocal);
+      return scalar $self->_mktime(\@vals, $islocal);
   }
 
   method day_list {
@@ -636,11 +577,11 @@ class Time::Piece {
 
   method cdate {
       my $time = shift;
-      if ($time->[c_islocal]) {
-          return scalar(CORE::localtime($time->epoch));
+      if ($self->{islocal}) {
+          return scalar(CORE::localtime($self->epoch));
       }
       else {
-          return scalar(CORE::gmtime($time->epoch));
+          return scalar(CORE::gmtime($self->epoch));
       }
   }
 
@@ -673,11 +614,11 @@ class Time::Piece {
       }
 
       if (blessed($rhs) && $rhs->isa('Time::Piece')) {
-          return Time::Seconds->new($time->epoch - $rhs->epoch);
+          return Time::Seconds->new($self->epoch - $rhs->epoch);
       }
       else {
           # rhs is seconds.
-          return $time->_mktime(($time->epoch - $rhs), $time->[c_islocal]);
+          return $self->_mktime(($self->epoch - $rhs), $self->{islocal});
       }
   }
 
@@ -685,7 +626,7 @@ class Time::Piece {
       my $time = shift;
       my $rhs = shift;
 
-      return $time->_mktime(($time->epoch + $rhs), $time->[c_islocal]);
+      return $self->_mktime(($self->epoch + $rhs), $self->{islocal});
   }
 
   use overload
@@ -712,7 +653,7 @@ class Time::Piece {
 
       croak("add_months requires a number of months") unless defined($num_months);
 
-      my $final_month = $time->_mon + $num_months;
+      my $final_month = $self->_mon + $num_months;
       my $num_years = 0;
       if ($final_month > 11 || $final_month < 0) {
           # these two ops required because we have no POSIX::floor and don't
@@ -728,21 +669,21 @@ class Time::Piece {
           $final_month = $final_month % 12;
       }
 
-      my @vals = _mini_mktime($time->sec, $time->min, $time->hour,
-                              $time->mday, $final_month, $time->year - 1900 + $num_years);
-      # warn(sprintf("got %d vals: %d-%d-%d %d:%d:%d [%d]\n", scalar(@vals), reverse(@vals), $time->[c_islocal]));
-      return scalar $time->_mktime(\@vals, $time->[c_islocal]);
+      my @vals = _mini_mktime($self->sec, $self->min, $self->hour,
+                              $self->mday, $final_month, $self->year - 1900 + $num_years);
+      # warn(sprintf("got %d vals: %d-%d-%d %d:%d:%d [%d]\n", scalar(@vals), reverse(@vals), $self->{islocal}));
+      return scalar $self->_mktime(\@vals, $self->{islocal});
   }
 
   method add_years {
       my ($time, $years) = @_;
-      $time->add_months($years * 12);
+      $self->add_months($years * 12);
   }
 
   method truncate {
       my ($time, %params) = @_;
       return $time unless exists $params{to};
-      #if ($params{to} eq 'week') { return $time->_truncate_week; }
+      #if ($params{to} eq 'week') { return $self->_truncate_week; }
       my %units = (
           second   => 0,
           minute   => 1,
@@ -756,11 +697,11 @@ class Time::Piece {
       croak "Invalid value of 'to' parameter: $params{to}" unless defined $to;
       my $start_month = 0;
       if ($params{to} eq 'quarter') {
-          $start_month = int( $time->_mon / 3 ) * 3;
+          $start_month = int( $self->_mon / 3 ) * 3;
       }
-      my @down_to = (0, 0, 0, 1, $start_month, $time->year);
-      return $time->_mktime([@down_to[0..$to-1], @$time[$to..c_isdst]],
-          $time->[c_islocal]);
+      my @down_to = (0, 0, 0, 1, $start_month, $self->year);
+      return $self->_mktime([@down_to[0..$to-1], @$time[$to..c_isdst]],
+          $self->{islocal});
   }
 
   #Given a format and a translate map, replace format flags in
