@@ -12,4 +12,36 @@ int32_t SPVM__Time__Piece__foo(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 }
 
+int32_t SPVM__Time__Piece__strftime(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t error_id = 0;
+  
+  void* obj_self = stack[0].oval;
+  
+  void* obj_format = stack[1].oval;
+  
+  if (!obj_format) {
+    return env->die(env, stack, "$format must be defined.", __func__, FILE_NAME, __LINE__);
+  }
+  
+  const char* format = env->get_chars(env, stack, obj_format);
+  
+  void* obj_tm = env->get_field_object_by_name(env, stack, obj_self, "tm", &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) { return error_id; }
+  
+  struct tm* st_tm = env->get_pointer(env, stack, obj_tm);
+  
+  int32_t ret_length = 128;
+  
+  void* obj_ret = env->new_string(env, stack, NULL, 128);
+  
+  char* ret = (char*)env->get_chars(env, stack, obj_ret);
+  
+  std::strftime(ret, ret_length, format, st_tm);
+  
+  stack[0].oval = obj_ret;
+  
+  return 0;
+}
+
 }
