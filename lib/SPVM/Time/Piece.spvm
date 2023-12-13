@@ -461,34 +461,82 @@ class Time::Piece {
       $ret_epoch = Time::Local->timegm($ret_tm);
     }
     
-    return scalar $self->_mktime($ret_epoch, $self->{islocal});
+    return $self->_mktime($ret_epoch, $self->{islocal});
   }
   
   method add_years : void ($years : int) {
     $self->add_months($years * 12);
   }
   
-  method truncate {
-      my ($time, %params) = @_;
-      return $time unless exists $params{to};
-      #if ($params{to} eq 'week') { return $self->_truncate_week; }
-      my %units = (
-          second   => 0,
-          minute   => 1,
-          hour     => 2,
-          day      => 3,
-          month    => 4,
-          quarter  => 5,
-          year     => 5
-      );
-      my $to = $units{$params{to}};
-      croak "Invalid value of 'to' parameter: $params{to}" unless defined $to;
-      my $start_month = 0;
-      if ($params{to} eq 'quarter') {
-          $start_month = int( $self->_mon / 3 ) * 3;
-      }
-      my @down_to = (0, 0, 0, 1, $start_month, $self->year);
-      return $self->_mktime([@down_to[0..$to-1], @$time[$to..c_isdst]],
-          $self->{islocal});
+  method truncate : Time::Piece ($options : object[]) {
+  
+    Fn->check_option_names($options, ["to"]);
+    
+    my $options_h = Hash->new($options);
+    
+    my $to = $options_h->get_string("to");
+    
+    unless ($to) {
+      die "The \"to\" option must be defined.";
+    }
+    
+    my $ret_tm = Sys->gmtime(0);
+    
+    if ($to eq "second") {
+      $ret_tm->set_tm_sec(0);
+    }
+    elsif ($to eq "minute") {
+      $ret_tm->set_tm_sec(0);
+      $ret_tm->set_tm_min(0);
+    }
+    elsif ($to eq "hour") {
+      $ret_tm->set_tm_sec(0);
+      $ret_tm->set_tm_min(0);
+      $ret_tm->set_tm_hour(0);
+    }
+    elsif ($to eq "day") {
+      $ret_tm->set_tm_sec(0);
+      $ret_tm->set_tm_min(0);
+      $ret_tm->set_tm_hour(0);
+      $ret_tm->set_tm_mday(1);
+    }
+    elsif ($to eq 'week') {
+      return $self->_truncate_week;
+    }
+    elsif ($to eq "month") {
+      $ret_tm->set_tm_sec(0);
+      $ret_tm->set_tm_min(0);
+      $ret_tm->set_tm_hour(0);
+      $ret_tm->set_tm_mday(1);
+      $ret_tm->set_tm_mon(0);
+    }
+    elsif ($to eq "quarter") {
+      $ret_tm->set_tm_sec(0);
+      $ret_tm->set_tm_min(0);
+      $ret_tm->set_tm_hour(0);
+      $ret_tm->set_tm_mday(1);
+      $ret_tm->set_tm_mon(($self->_mon / 3) * 3);
+    }
+    elsif ($to eq "year") {
+      $ret_tm->set_tm_sec(0);
+      $ret_tm->set_tm_min(0);
+      $ret_tm->set_tm_hour(0);
+      $ret_tm->set_tm_mday(1);
+      $ret_tm->set_tm_mon(0);
+      $ret_tm->set_tm_year($self->year);
+    }
+    else {
+      die "The value of the \"$to\" option is invalid.";
+    }
+    
+    my $ret_epoch = 0;
+    if ($self->{islocal}) {
+      $ret_epoch = Time::Local->timelocal($ret_tm);
+    }
+    else {
+      $ret_epoch = Time::Local->timegm($ret_tm);
+    }
+    
+    return $self->_mktime($ret_epoch, $self->{islocal});
   }
 }
