@@ -299,60 +299,59 @@ class Time::Piece {
     
     return Fn->join("T", [$self->date($DATE_SEP), $self->time($TIME_SEP)]);
   }
-
-  # Julian Day is always calculated for UT regardless
-  # of local time
-  method julian_day {
-      
-      # Correct for localtime
-      $time = $self->gmtime( $self->epoch ) if $self->{islocal};
-
-      # Calculate the Julian day itself
-      my $jd = $self->_jd( $self->year, $self->mon, $self->mday,
-                          $self->hour, $self->min, $self->sec);
-
-      return $jd;
+  
+  method julian_day : double {
+    
+    my $tm = (Time::Piece)undef;
+    
+    if ($self->{islocal}) {
+      $tm = Sys->gmtime($self->epoch);
+    }
+    else {
+      $tm = $self->tm;
+    }
+    
+    my $jd = $self->_jd($tm);
+    
+    return $jd;
   }
-
-  # MJD is defined as JD - 2400000.5 days
-  method mjd {
-      return shift->julian_day - 2_400_000.5;
+  
+  method mjd : double () {
+    
+    return (double)$self->julian_day - 2_400_000.5;
   }
-
-  # Internal calculation of Julian date. Needed here so that
-  # both tzoffset and mjd/jd methods can share the code
-  # Algorithm from Hatcher 1984 (QJRAS 25, 53-55), and
-  #  Hughes et al, 1989, MNRAS, 238, 15
-  # See: http://adsabs.harvard.edu/cgi-bin/nph-bib_query?bibcode=1989MNRAS.238.1529H&db_key=AST
-  # for more details
-
-  method _jd {
-      
-      my ($y, $m, $d, $h, $n, $s) = @_;
-
-      # my ($s,$n,$h,$d,$m,$y) = @_; $m += 1; $y += 1900;
-        
-      # Adjust input parameters according to the month
-      $y = ( $m > 2 ? $y : $y - 1);
-      $m = ( $m > 2 ? $m - 3 : $m + 9);
-
-      # Calculate the Julian Date (assuming Julian calendar)
-      my $J = int( 365.25 *( $y + 4712) )
-        + int( (30.6 * $m) + 0.5)
-          + 59
-            + $d
-              - 0.5;
-
-      # Calculate the Gregorian Correction (since we have Gregorian dates)
-      my $G = 38 - int( 0.75 * int(49+($y/100)));
-
-      # Calculate the actual Julian Date
-      my $JD = $J + $G;
-
-      # Modify to include hours/mins/secs in floating portion.
-      return $JD + ($h + ($n + $s / 60) / 60) / 24;
+  
+  method _jd : long ($tm : Sys::Time::Tm) {
+    
+    my $y = $tm->tm_year + 1900;
+    my $m = $tm->tm_mon + 1;
+    my $d = $tm->tm_mday;
+    my $h = $tm->tm_hour;
+    my $n = $tm->tm_min;
+    my $s = $tm->tm_sec;
+    
+    if ($m > 2) {
+      $m = $m - 3;
+    }
+    else {
+      $y = $y - 1;
+      $m = $m + 9;
+    }
+    
+    my $J = ((long)( 365.25 *( $y + 4712) )
+      + (long)( (30.6 * $m) + 0.5)
+        + 59
+          + $d
+            - 0.5;
+    
+    my $G = 38 - ((long))( 0.75 * ((long))(49+($y/100)));
+    
+    # Calculate the actual Julian Date
+    my $JD = $J + $G;
+    
+    return $JD + ($h + ($n + $s / 60) / 60) / 24;
   }
-
+  
   method week {
       
 
