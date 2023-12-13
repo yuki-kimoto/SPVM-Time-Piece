@@ -35,83 +35,55 @@ class Time::Piece {
     $FULLDAY_LIST = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
   }
   
-  method localtime {
-      unshift @_, __PACKAGE__ unless eval { $_[0]->isa('Time::Piece') };
-      my $class = shift;
-      my $time  = shift;
-      $time = time if (!defined $time);
-      $class->_mktime($time, 1);
+  method localtime ($time : long = -1) {
+    
+    if ($time < 0) {
+      $time = Sys->time;
+    }
+    
+    return &_mktime($time, 1);
   }
   
-  method gmtime {
-      unshift @_, __PACKAGE__ unless eval { $_[0]->isa('Time::Piece') };
-      my $class = shift;
-      my $time  = shift;
-      $time = time if (!defined $time);
-      $class->_mktime($time, 0);
+  method gmtime  {
+    
+    if ($time < 0) {
+      $time = Sys->time;
+    }
+    
+    return &_mktime($time, 0);
   }
   
-  
-  method _is_time_struct {
-      return 1 if ref($_[1]) eq 'ARRAY';
-      return 1 if blessed($_[1]) && $_[1]->isa('Time::Piece');
-
-      return 0;
-  }
-
-
-  method new {
-      my $class = shift;
-      my ($time) = @_;
-
-      my $self;
-
-      if ($class->_is_time_struct($time)) {
-          $self = $self->{islocal} ? $class->localtime($time) : $class->gmtime($time);
-      }
-      elsif (defined($time)) {
-          $self = $class->localtime($time);
-      }
-      elsif (ref($class) && $class->isa(__PACKAGE__)) {
-          $self = $class->_mktime($class->epoch, $class->[c_islocal]);
-      }
-      else {
-          $self = $class->localtime();
-      }
-      
-      return bless $self, ref($class) || $class;
+  method _mktime : Time::Piece ($time : long, $islocal : int) {
+    
+    Sys::Time->tzset;
+    
+    my $new_tp = new Time::Piece;
+    
+    my $new_tm = (Time::Piece)undef;
+    if ($islocal) {
+      $new_tm = Sys->localtime($time);
+    }
+    else {
+      $new_tm = Sys->gmtime($time);
+    }
+    
+    $new_tm->{tm} = $new_tm;
+    
+    $new_tm->{epoch} = $time;
+    
+    $new_tm->{islocal} = $islocal;
+    
+    return $new_tp;
   }
   
-  method _mktime {
-      my ($class, $time, $islocal) = @_;
-
-      $class = blessed($class) || $class;
-
-      if ($class->_is_time_struct($time)) {
-          my @new_time = @$time;
-          my @tm_parts = (@new_time[c_sec .. c_mon], $new_time[c_year]+1900);
-
-          $new_time[c_epoch] = $islocal ? timelocal(@tm_parts) : timegm(@tm_parts);
-
-          return wantarray ? @new_time : bless [@new_time[0..9], $islocal], $class;
-      }
-      _tzset();
-      my @time = $islocal ?
-              CORE::localtime($time)
-                  :
-              CORE::gmtime($time);
-      wantarray ? @time : bless [@time, $time, $islocal], $class;
-  }
-  
-  ## Methods ##
-
+  # Instance Methods
   method sec {
       my $time = shift;
       $self->[c_sec];
   }
-
+  
   *second = \&sec;
-
+  
   method min {
       my $time = shift;
       $self->[c_min];
@@ -266,18 +238,18 @@ class Time::Piece {
   }
 
   method epoch {
-      my $time = shift;
-      if (defined($self->[c_epoch])) {
-          return $self->[c_epoch];
-      }
-      else {
-          my $epoch = $self->{islocal} ?
-            timelocal(@{$time}[c_sec .. c_mon], $self->[c_year]+1900)
-            :
-            timegm(@{$time}[c_sec .. c_mon], $self->[c_year]+1900);
-          $self->[c_epoch] = $epoch;
-          return $epoch;
-      }
+    my $time = shift;
+    if (defined($self->[c_epoch])) {
+      return $self->[c_epoch];
+    }
+    else {
+      my $epoch = $self->{islocal} ?
+        Time::Local->timelocal(@{$time}[c_sec .. c_mon], $self->[c_year]+1900)
+        :
+        Time::Local->timegm(@{$time}[c_sec .. c_mon], $self->[c_year]+1900);
+      $self->[c_epoch] = $epoch;
+      return $epoch;
+    }
   }
 
   method hms {
@@ -593,35 +565,12 @@ class Time::Piece {
       }
       return $reverse ? $rhs cmp $lhs->cdate : $lhs->cdate cmp $rhs;
   }
-
-  use overload
-          '-' => \&subtract,
-          '+' => \&add;
-
-  method subtract {
-      my $time = shift;
-      my $rhs = shift;
-
-      if (shift)
-      {
-  	# SWAPED is set (so someone tried an expression like NOTDATE - DATE).
-  	# Imitate Perl's standard behavior and return the result as if the
-  	# string $time resolves to was subtracted from NOTDATE.  This way,
-  	# classes which override this one and which have a stringify function
-  	# that resolves to something that looks more like a number don't need
-  	# to override this function.
-  	return $rhs - "$time";
-      }
-
-      if (blessed($rhs) && $rhs->isa('Time::Piece')) {
-          return Time::Seconds->new($self->epoch - $rhs->epoch);
-      }
-      else {
-          # rhs is seconds.
-          return $self->_mktime(($self->epoch - $rhs), $self->{islocal});
-      }
+  
+  method subtract : Time::Piece ($rhs : Time::Seconds) {
+    
+    return $self->_mktime(($self->epoch - $rhs->{seconds}), $self->{islocal});
   }
-
+  
   method add {
       my $time = shift;
       my $rhs = shift;
