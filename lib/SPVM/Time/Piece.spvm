@@ -354,169 +354,52 @@ class Time::Piece {
   }
   
   method week {
-      
-
-      my $J  = $self->julian_day;
-      # Julian day is independent of time zone so add on tzoffset
-      # if we are using local time here since we want the week day
-      # to reflect the local time rather than UTC
-      $J += ($self->tzoffset/(24*3600)) if $self->{islocal};
-
-      # Now that we have the Julian day including fractions
-      # convert it to an integer Julian Day Number using nearest
-      # int (since the day changes at midday we convert all Julian
-      # dates to following midnight).
-      $J = int($J+0.5);
-
-      use integer;
-      my $d4 = ((($J + 31741 - ($J % 7)) % 146097) % 36524) % 1461;
-      my $L  = $d4 / 1460;
-      my $d1 = (($d4 - $L) % 365) + $L;
-      return $d1 / 7 + 1;
+    
+    my $J  = $self->julian_day;
+    # Julian day is independent of time zone so add on tzoffset
+    # if we are using local time here since we want the week day
+    # to reflect the local time rather than UTC
+    $J += ($self->tzoffset/(24*3600)) if $self->{islocal};
+    
+    # Now that we have the Julian day including fractions
+    # convert it to an integer Julian Day Number using nearest
+    # int (since the day changes at midday we convert all Julian
+    # dates to following midnight).
+    $J = int($J+0.5);
+    
+    use integer;
+    my $d4 = ((($J + 31741 - ($J % 7)) % 146097) % 36524) % 1461;
+    my $L  = $d4 / 1460;
+    my $d1 = (($d4 - $L) % 365) + $L;
+    return $d1 / 7 + 1;
   }
-
-  method _is_leap_year {
-      my $year = shift;
-      return (($year %4 == 0) && !($year % 100 == 0)) || ($year % 400 == 0)
-                 ? 1 : 0;
+  
+  method _is_leap_year : int ($year : int) {
+    
+    return (($year %4 == 0) && !($year % 100 == 0)) || ($year % 400 == 0);
   }
-
+  
   method is_leap_year {
-      
-      my $year = $self->year;
-      return _is_leap_year($year);
+    
+    my $year = $self->year;
+    
+    return _is_leap_year($year);
   }
-
-  my @MON_LAST = qw(31 28 31 30 31 30 31 31 30 31 30 31);
-
+  
   method month_last_day {
-      
-      my $year = $self->year;
-      my $_mon = $self->_mon;
-      return $MON_LAST[$_mon] + ($_mon == 1 ? _is_leap_year($year) : 0);
+    
+    my @MON_LAST = qw(31 28 31 30 31 30 31 31 30 31 30 31);
+    
+    my $year = $self->year;
+    my $_mon = $self->_mon;
+    
+    return $MON_LAST->[$_mon] + ($_mon == 1 ? _is_leap_year($year) : 0);
   }
-
-  my $trans_map_common = {
-
-      'c' => method {
-          my ( $format ) = @_;
-          if($LOCALE->{PM} && $LOCALE->{AM}){
-              $format =~ s/%c/%a %d %b %Y %I:%M:%S %p/;
-          }
-          else{
-              $format =~ s/%c/%a %d %b %Y %H:%M:%S/;
-          }
-          return $format;
-      },
-      'r' => method {
-          my ( $format ) = @_;
-          if($LOCALE->{PM} && $LOCALE->{AM}){
-              $format =~ s/%r/%I:%M:%S %p/;
-          }
-          else{
-              $format =~ s/%r/%H:%M:%S/;
-          }
-          return $format;
-      },
-      'X' => method {
-          my ( $format ) = @_;
-          if($LOCALE->{PM} && $LOCALE->{AM}){
-              $format =~ s/%X/%I:%M:%S %p/;
-          }
-          else{
-              $format =~ s/%X/%H:%M:%S/;
-          }
-          return $format;
-      },
-  };
-
-  my $strftime_trans_map = {
-      %{$trans_map_common},
-
-      'e' => method {
-          my ( $format, $time ) = @_;
-          $format =~ s/%e/%d/ if $IS_WIN32;
-          return $format;
-      },
-      'D' => method {
-          my ( $format, $time ) = @_;
-          $format =~ s/%D/%m\/%d\/%y/;
-          return $format;
-      },
-      'F' => method {
-          my ( $format, $time ) = @_;
-          $format =~ s/%F/%Y-%m-%d/;
-          return $format;
-      },
-      'R' => method {
-          my ( $format, $time ) = @_;
-          $format =~ s/%R/%H:%M/;
-          return $format;
-      },
-      's' => method {
-          #%s not portable if time parts are from gmtime since %s will
-          #cause a call to native mktime (and thus uses local TZ)
-          my ( $format, $time ) = @_;
-          $format =~ s/%s/$self->{epoch}/;
-          return $format;
-      },
-      'T' => method {
-          my ( $format, $time ) = @_;
-          $format =~ s/%T/%H:%M:%S/ if $IS_WIN32;
-          return $format;
-      },
-      'u' => method {
-          my ( $format, $time ) = @_;
-          $format =~ s/%u/%w/ if $IS_WIN32;
-          return $format;
-      },
-      'V' => method {
-          my ( $format, $time ) = @_;
-          my $week = Format->sprintf( "%02d", $self->week() );
-          $format =~ s/%V/$week/ if $IS_WIN32;
-          return $format;
-      },
-      'x' => method {
-          my ( $format, $time ) = @_;
-          $format =~ s/%x/%a %d %b %Y/;
-          return $format;
-      },
-      'z' => method {    #%[zZ] not portable if time parts are from gmtime
-          my ( $format, $time ) = @_;
-          $format =~ s/%z/+0000/ if not $self->{islocal};
-          return $format;
-      },
-      'Z' => method {
-          my ( $format, $time ) = @_;
-          $format =~ s/%Z/UTC/ if not $self->{islocal};
-          return $format;
-      },
-  };
-
-  method strftime {
-      
-      my $format = @_ ? shift(@_) : '%a, %d %b %Y %H:%M:%S %Z';
-      $format = _translate_format($format, $strftime_trans_map, $time);
-
-      return $format unless $format =~ /%/; #if translate removes everything
-
-      return _strftime($format, $self->epoch, $self->{islocal});
-  }
-
-  my $strptime_trans_map = {
-      %{$trans_map_common},
-  };
-
-  method strptime {
-      
-      my $string = shift;
-      my $format = @_ ? shift(@_) : "%a, %d %b %Y %H:%M:%S %Z";
-      my $islocal = (ref($time) ? $self->{islocal} : 0);
-      $format = _translate_format($format, $strptime_trans_map);
-      my @vals = _strptime($string, $format, $islocal, $locales);
-      return scalar $self->_mktime(\@vals, $islocal);
-  }
-
+  
+  native method strftime : string ($format : string);
+  
+  native static method strptime : Time::Piece ($string : string, $format : string) {
+  
   method cdate : string () {
     
     return $self->strftime("%a %b %d %H:%M:%S %Y", 
