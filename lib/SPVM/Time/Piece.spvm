@@ -570,7 +570,13 @@ class Time::Piece {
     $ret_tm->set_tm_mon($final_month);
     $ret_tm->set_tm_year( $current_tm->year - 1900 + $num_years);
     
-    my $ret_epoch = Time::Local->timelocal($ret_tm);
+    my $ret_epoch = 0;
+    if ($self->{islocal}) {
+      $ret_epoch = Time::Local->timelocal($ret_tm);
+    }
+    else {
+      $ret_epoch = Time::Local->timegm($ret_tm);
+    }
     
     return scalar $self->_mktime($ret_epoch, $self->{islocal});
   }
@@ -602,36 +608,4 @@ class Time::Piece {
       return $self->_mktime([@down_to[0..$to-1], @$time[$to..c_isdst]],
           $self->{islocal});
   }
-
-  #Given a format and a translate map, replace format flags in
-  #accordance with the logic from the translation map subroutines
-  method _translate_format {
-      my ( $format, $trans_map, $time ) = @_;
-
-      $format =~ s/%%/\e\e/g; #escape the escape
-      my $lexer = _build_format_lexer($format);
-
-  	while(my $flag = $lexer->() ){
-          next unless exists $trans_map->{$flag};
-  		$format = $trans_map->{$flag}($format, $time);
-  	}
-
-      $format =~ s/\e\e/%%/g;
-      return $format;
-  }
-
-  method _build_format_lexer {
-      my $format = shift();
-
-      #Higher Order Perl p.359 (or thereabouts)
-      return method {
-          LABEL: {
-          return $1 if $format =~ m/\G%([a-zA-Z])/gc; #return single char flags
-
-          redo LABEL if $format =~ m/\G(.)/gc;
-          return; #return at empty string
-          }
-      };
-  }
-
 }
