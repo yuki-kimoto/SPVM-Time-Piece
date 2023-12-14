@@ -78,6 +78,8 @@ int32_t SPVM__Time__Piece__strptime_tm(SPVM_ENV* env, SPVM_VALUE* stack) {
     return env->die(env, stack, "std::get_time failed.", __func__, FILE_NAME, __LINE__);
   }
   
+  spvm_warn("AAA %d", st_tm->tm_sec);
+  
   void* obj_tm = env->new_pointer_object_by_name(env, stack, "Sys::Time::Tm", st_tm, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
   

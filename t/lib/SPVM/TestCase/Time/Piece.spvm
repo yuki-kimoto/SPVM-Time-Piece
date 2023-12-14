@@ -33,4 +33,51 @@ class TestCase::Time::Piece {
     
     return 1;
   }
+  
+  static method strptime : int () {
+    {
+      my $tp = Time::Piece->strptime("2022-12-13 10:11:56", "%Y-%m-%d %H:%M:%S");
+      
+      unless ($tp->year == 2022) {
+        return 0;
+      }
+      
+      unless ($tp->mon == 12) {
+        return 0;
+      }
+      
+      unless ($tp->mday == 13) {
+        return 0;
+      }
+      
+      warn;
+      
+      unless ($tp->hour == 10) {
+        return 0;
+      }
+      
+      warn;
+      
+      unless ($tp->min == 11) {
+        return 0;
+      }
+      
+      warn $tp->sec;
+      
+=pod TODO
+
+      unless ($tp->sec == 56) {
+        return 0;
+      }
+      
+=cut
+      
+      warn;
+      
+    }
+    
+    warn;
+    
+    return 1;
+  }
 }

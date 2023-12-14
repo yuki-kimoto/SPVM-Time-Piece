@@ -55,7 +55,7 @@ class Time::Piece {
     return &_mktime($epoch, 0);
   }
   
-  static method _mktime : Time::Piece ($epoch : long, $islocal : int) {
+  private static method _mktime : Time::Piece ($epoch : long, $islocal : int) {
     
     # Sys::Time->tzset;
     
