@@ -41,9 +41,15 @@ class Time::Piece {
       $epoch = Sys->time;
     }
     
+    my $new_tp = new Time::Piece;
     
+    my $new_tm = Sys->localtime($epoch);
     
-    return &_mktime($epoch, 1);
+    $new_tp->{tm} = $new_tm;
+    
+    $new_tp->{is_localtime} = 1;
+    
+    return $new_tp;
   }
   
   static method gmtime : Time::Piece ($epoch : long = -1) {
@@ -52,12 +58,16 @@ class Time::Piece {
       $epoch = Sys->time;
     }
     
-    return &_mktime($epoch, 0);
+    my $new_tp = new Time::Piece;
+    
+    my $new_tm = Sys->localtime($epoch);
+    
+    $new_tp->{tm} = $new_tm;
+    
+    return $new_tp;
   }
   
   private static method _mktime : Time::Piece ($epoch : long, $is_localtime : int) {
-    
-    # Sys::Time->tzset;
     
     my $new_tp = new Time::Piece;
     
