@@ -185,19 +185,11 @@ class Time::Piece {
     return $self->{tm}->tm_year;
   }
   
-  method yy : string () {
+  method yy : int () {
     
     my $res = $self->{tm}->tm_year % 100;
     
-    my $res_string = (string)undef;
-    if ($res > 9) {
-      $res_string = "$res";
-    }
-    else {
-      $res_string = "0$res";
-    }
-    
-    return $res_string;
+    return $res;
   }
   
   method wday : int () {

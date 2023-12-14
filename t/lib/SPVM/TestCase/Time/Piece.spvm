@@ -122,10 +122,21 @@ class TestCase::Time::Piece {
         return 0;
       }
       
+      unless ($tp->fullmonth eq "December") {
+        return 0;
+      }
+      
       unless ($tp->year == 2022) {
         return 0;
       }
       
+      unless ($tp->_year == 122) {
+        return 0;
+      }
+      
+      unless ($tp->yy == 22) {
+        return 0;
+      }
     }
     
     warn;
