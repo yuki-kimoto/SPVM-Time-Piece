@@ -3,6 +3,10 @@
 
 #include "spvm_native.h"
 
+#include <time.h>
+#include <sstream>
+#include <iomanip>
+
 extern "C" {
 
 static const char* FILE_NAME = "Time/Piece.cpp";
@@ -29,7 +33,7 @@ int32_t SPVM__Time__Piece__strftime(SPVM_ENV* env, SPVM_VALUE* stack) {
   void* obj_tm = env->get_field_object_by_name(env, stack, obj_self, "tm", &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
   
-  struct tm* st_tm = env->get_pointer(env, stack, obj_tm);
+  struct tm* st_tm = (struct tm*)env->get_pointer(env, stack, obj_tm);
   
   int32_t ret_length = 128;
   
@@ -37,7 +41,7 @@ int32_t SPVM__Time__Piece__strftime(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   char* ret = (char*)env->get_chars(env, stack, obj_ret);
   
-  std::strftime(ret, ret_length, format, st_tm);
+  strftime(ret, ret_length, format, st_tm);
   
   stack[0].oval = obj_ret;
   
@@ -64,7 +68,7 @@ int32_t SPVM__Time__Piece__strptime_tm(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   const char* format = env->get_chars(env, stack, obj_format);
   
-  struct tm* st_tm = env->new_memory_block(env, stack, sizeof(struct tm));
+  struct tm* st_tm = (struct tm*)env->new_memory_block(env, stack, sizeof(struct tm));
   
   std::istringstream string_stream(string);
   
