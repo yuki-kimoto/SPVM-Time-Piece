@@ -236,9 +236,9 @@ class Time::Piece {
     }
   }
   
-  method day : string () {
+  method day : string ($day_list : string[] = undef) {
     
-    return $self->wdayname;
+    return $self->wdayname($day_list);
   }
   
   method fullday : string ($day_list : string[] = undef) {
