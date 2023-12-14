@@ -247,7 +247,7 @@ class Time::Piece {
       return $day_list->[$self->{tm}->tm_wday];
     }
     else {
-      return $day_list->[$self->{tm}->tm_wday];
+      return $FULLDAY_LIST->[$self->{tm}->tm_wday];
     }
   }
   

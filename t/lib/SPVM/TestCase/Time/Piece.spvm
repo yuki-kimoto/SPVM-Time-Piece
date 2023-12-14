@@ -150,6 +150,18 @@ class TestCase::Time::Piece {
         return 0;
       }
       
+      unless ($tp->wdayname eq "Tue") {
+        return 0;
+      }
+      
+      unless ($tp->day eq "Tue") {
+        return 0;
+      }
+      
+      unless ($tp->fullday eq "Tuesday") {
+        return 0;
+      }
+      
     }
     
     return 1;
