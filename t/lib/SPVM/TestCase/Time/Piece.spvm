@@ -214,6 +214,26 @@ class TestCase::Time::Piece {
         return 0;
       }
       
+      unless ($tp->mdy eq "12-13-2022") {
+        return 0;
+      }
+      
+      unless ($tp->mdy("/") eq "12/13/2022") {
+        return 0;
+      }
+      
+      unless ($tp->dmy eq "13-12-2022") {
+        return 0;
+      }
+      
+      unless ($tp->dmy(".") eq "13.12.2022") {
+        return 0;
+      }
+      
+      unless ($tp->datetime eq "2022-12-13T10:11:56") {
+        return 0;
+      }
+      
     }
     
     return 1;
