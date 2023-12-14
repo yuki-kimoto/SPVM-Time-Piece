@@ -20,8 +20,6 @@ class Time::Piece {
   our $LOCALE : string[];
   
   # Fields
-  has epoch : long;
-  
   has is_localtime : byte;
   
   has tm : Sys::Time::Tm;
@@ -42,6 +40,8 @@ class Time::Piece {
     if ($epoch < 0) {
       $epoch = Sys->time;
     }
+    
+    
     
     return &_mktime($epoch, 1);
   }
@@ -70,8 +70,6 @@ class Time::Piece {
     }
     
     $new_tp->{tm} = $new_tm;
-    
-    $new_tp->{epoch} = $epoch;
     
     $new_tp->{is_localtime} = (byte)$is_localtime;
     
@@ -270,7 +268,18 @@ class Time::Piece {
   }
   
   method epoch : long () {
-    return $self->{epoch};
+    my $epoch = -1L;
+    
+    my $tm = $self->{tm};
+    
+    if ($self->{is_localtime}) {
+      $epoch = Time::Local->timelocal($tm);
+    }
+    else {
+      $epoch = Time::Local->timegm($tm);
+    }
+    
+    return $epoch;
   }
   
   method hms : string ($sep : string = undef) {
@@ -437,7 +446,7 @@ class Time::Piece {
   }
   
   method compare : int ($lhs : Time::Piece, $rhs : Time::Piece) {
-    return $lhs->{epoch} <=> $rhs->{epoch};
+    return $lhs->epoch <=> $rhs->epoch;
   }
   
   method add_months : Time::Piece ($num_months : int) {
