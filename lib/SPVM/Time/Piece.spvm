@@ -4,10 +4,10 @@
 class Time::Piece {
   version "0.001";
   
+  use Sys;
   use Time::Seconds;
   use Time::Local;
   use Sys::Time::Tm;
-  use Math;
   
   # Class Variables
   our $DATE_SEP : string;
@@ -61,7 +61,7 @@ class Time::Piece {
     
     my $new_tp = new Time::Piece;
     
-    my $new_tm = (Time::Piece)undef;
+    my $new_tm = (Sys::Time::Tm)undef;
     if ($islocal) {
       $new_tm = Sys->localtime($epoch);
     }
@@ -69,11 +69,11 @@ class Time::Piece {
       $new_tm = Sys->gmtime($epoch);
     }
     
-    $new_tm->{tm} = $new_tm;
+    $new_tp->{tm} = $new_tm;
     
-    $new_tm->{epoch} = $epoch;
+    $new_tp->{epoch} = $epoch;
     
-    $new_tm->{islocal} = $islocal;
+    $new_tp->{islocal} = (byte)$islocal;
     
     return $new_tp;
   }
@@ -339,7 +339,7 @@ class Time::Piece {
     return (double)$self->julian_day - 2_400_000.5;
   }
   
-  method _jd : long ($tm : Sys::Time::Tm) {
+  method _jd : double ($tm : Sys::Time::Tm) {
     
     my $y = $tm->tm_year + 1900;
     my $m = $tm->tm_mon + 1;

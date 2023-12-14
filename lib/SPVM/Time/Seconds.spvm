@@ -57,11 +57,11 @@ class Time::Seconds {
     $self->{seconds} -= $seconds;
   }
   
-  method copy : Time::Seconds {
+  method copy : Time::Seconds () {
     return Time::Seconds->new($self->{seconds});
   }
   
-  method minutes : double {
+  method minutes : double () {
     return $self->{seconds} / 60;
   }
   
@@ -81,7 +81,7 @@ class Time::Seconds {
     return $self->days / 30.4368541;
   }
    
-  method financial_months () : double {
+  method financial_months : double () {
     return  $self->days / 30;
   }
   
