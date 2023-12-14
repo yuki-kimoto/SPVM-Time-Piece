@@ -60,7 +60,7 @@ class Time::Piece {
     
     my $new_tp = new Time::Piece;
     
-    my $new_tm = Sys->localtime($epoch);
+    my $new_tm = Sys->gmtime($epoch);
     
     $new_tp->{tm} = $new_tm;
     
