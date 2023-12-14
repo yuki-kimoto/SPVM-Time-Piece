@@ -190,6 +190,30 @@ class TestCase::Time::Piece {
         return 0;
       }
       
+      unless ($tp->hms eq "10:11:56") {
+        return 0;
+      }
+      
+      unless ($tp->hms(".") eq "10.11.56") {
+        return 0;
+      }
+      
+      unless ($tp->time eq "10:11:56") {
+        return 0;
+      }
+      
+      unless ($tp->time(".") eq "10.11.56") {
+        return 0;
+      }
+      
+      unless ($tp->ymd eq "2022-12-13") {
+        return 0;
+      }
+      
+      unless ($tp->date eq "2022-12-13") {
+        return 0;
+      }
+      
     }
     
     return 1;
