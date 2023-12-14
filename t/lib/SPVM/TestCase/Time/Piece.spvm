@@ -242,9 +242,35 @@ class TestCase::Time::Piece {
         return 0;
       }
       
+      unless ($tp->tzoffset->seconds == 0) {
+        return 0;
+      }
+      
     }
     
     return 1;
   }
   
+  static method tzoffset : int () {
+    
+    {
+      my $tp = Time::Piece->gmtime;
+      
+      unless ($tp->tzoffset->seconds == 0) {
+        return 0;
+      }
+    }
+    
+    {
+      my $tp = Time::Piece->localtime;
+      
+      warn $tp->tzoffset->seconds;
+      
+      if ($tp->tzoffset->seconds == 0) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
 }

@@ -24,6 +24,8 @@ class Time::Piece {
   
   has tm : Sys::Time::Tm;
   
+  has epoch : ro long;
+  
   INIT {
     $DATE_SEP = "-";
     $TIME_SEP = ":";
@@ -49,6 +51,8 @@ class Time::Piece {
     
     $new_tp->{is_localtime} = 1;
     
+    $new_tp->{epoch} = $epoch;
+    
     return $new_tp;
   }
   
@@ -63,6 +67,8 @@ class Time::Piece {
     my $new_tm = Sys->gmtime($epoch);
     
     $new_tp->{tm} = $new_tm;
+    
+    $new_tp->{epoch} = $epoch;
     
     return $new_tp;
   }
@@ -83,6 +89,8 @@ class Time::Piece {
     
     $new_tp->{is_localtime} = (byte)$is_localtime;
     
+    $new_tp->{epoch} = $epoch;
+    
     return $new_tp;
   }
   
@@ -99,6 +107,8 @@ class Time::Piece {
     my $wday = &dayofweek($epoch);
     
     $new_tp->{tm}->set_tm_wday($wday);
+    
+    $new_tp->{epoch} = $epoch;
     
     return $new_tp;
   }
@@ -279,29 +289,22 @@ class Time::Piece {
     
     my $epoch = $self->epoch;
     
+    warn $epoch;
+    
     my $delta = 24 * ($self->_jd(Sys->localtime($epoch)) - $self->_jd(Sys->gmtime($epoch)));
+    
+    warn $delta;
     
     my $delta_float = 0.5;
     if ($delta < 0) {
       $delta_float = -$delta_float;
     }
     
-    return Time::Seconds->new( (int)($delta * 60 + ($delta_float)) * 60 );
-  }
-  
-  method epoch : long () {
-    my $epoch = -1L;
+    my $seconds = (int)($delta * 60 + ($delta_float)) * 60;
     
-    my $tm = $self->{tm};
+    warn $seconds;
     
-    if ($self->{is_localtime}) {
-      $epoch = Time::Local->timelocal($tm);
-    }
-    else {
-      $epoch = Time::Local->timegm($tm);
-    }
-    
-    return $epoch;
+    return Time::Seconds->new($seconds);
   }
   
   method hms : string ($sep : string = undef) {
@@ -403,7 +406,13 @@ class Time::Piece {
     # Calculate the actual Julian Date
     my $JD = $J + $G;
     
-    return $JD + ($h + ($n + $s / 60) / 60) / 24;
+    warn $JD;
+    
+    my $ret = $JD + ($h + ($n + $s / 60) / 60) / 24;
+    
+    warn $ret;
+    
+    return $ret;
   }
   
   method week : int () {

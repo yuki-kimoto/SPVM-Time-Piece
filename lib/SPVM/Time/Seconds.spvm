@@ -5,7 +5,7 @@ class Time::Seconds {
   allow Time::Piece;
   
   # Fields
-  has seconds : double;
+  has seconds : ro double;
   
   # Class Methods
   static method new : Time::Seconds ($second : double = 0) {
