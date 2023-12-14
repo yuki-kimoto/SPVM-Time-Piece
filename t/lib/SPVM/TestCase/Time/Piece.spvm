@@ -2,6 +2,7 @@ class TestCase::Time::Piece {
   
   use Sys;
   use Time::Piece;
+  use Format;
   
   static method test : int () {
     
@@ -267,6 +268,19 @@ class TestCase::Time::Piece {
       my $tzoffset = $tp->tzoffset;
       
       warn "[Test Output]tzoffset:" . $tzoffset->hours;
+    }
+    
+    return 1;
+  }
+  
+  static method julian_day : int () {
+    
+    {
+      my $tp = Time::Piece->gmtime;
+      
+      my $julian_day = $tp->julian_day;
+      
+      warn "[Test Output]julian_day:" . Format->sprintf("%.10f", [(object)$julian_day]);
     }
     
     return 1;
