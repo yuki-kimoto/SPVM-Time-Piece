@@ -264,11 +264,9 @@ class TestCase::Time::Piece {
     {
       my $tp = Time::Piece->localtime;
       
-      warn $tp->tzoffset->seconds;
+      my $tzoffset = $tp->tzoffset;
       
-      if ($tp->tzoffset->seconds == 0) {
-        return 0;
-      }
+      warn "[Test Output]tzoffset:" . $tzoffset->hours;
     }
     
     return 1;

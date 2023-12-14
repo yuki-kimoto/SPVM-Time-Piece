@@ -289,20 +289,18 @@ class Time::Piece {
     
     my $epoch = $self->epoch;
     
-    warn $epoch;
+    my $jd_localtime = $self->_jd(Sys->localtime($epoch));
     
-    my $delta = 24 * ($self->_jd(Sys->localtime($epoch)) - $self->_jd(Sys->gmtime($epoch)));
+    my $jd_gmtime = $self->_jd(Sys->gmtime($epoch));
     
-    warn $delta;
+    my $tzoffset = 24 * ($jd_localtime - $jd_gmtime);
     
-    my $delta_float = 0.5;
-    if ($delta < 0) {
-      $delta_float = -$delta_float;
+    my $minite_round = 0.5;
+    if ($tzoffset < 0) {
+      $minite_round = -$minite_round;
     }
     
-    my $seconds = (int)($delta * 60 + ($delta_float)) * 60;
-    
-    warn $seconds;
+    my $seconds = (int)($tzoffset * 60 + ($minite_round)) * 60;
     
     return Time::Seconds->new($seconds);
   }
@@ -395,22 +393,22 @@ class Time::Piece {
       $m = $m + 9;
     }
     
-    my $J = (int)( 365.25 *( $y + 4712) )
-      + (int)( (30.6 * $m) + 0.5)
+    my $J = (double)(int)( 365.25 *( $y + 4712) )
+      + (double)(int)( (30.6 * $m) + 0.5)
         + 59
           + $d
             - 0.5;
     
-    my $G = 38 - (int)( 0.75 * (int)(49 + ($y/100)));
+    my $G = 38 - (double)(int)( 0.75 * (double)(int)(49 + ($y / 100)));
     
     # Calculate the actual Julian Date
     my $JD = $J + $G;
     
-    warn $JD;
+    my $ret = $JD + ($h + ($n + (double)$s / 60) / 60) / 24;
     
-    my $ret = $JD + ($h + ($n + $s / 60) / 60) / 24;
-    
-    warn $ret;
+    unless ($ret isa double) {
+      die "Unexpected Error.";
+    }
     
     return $ret;
   }
