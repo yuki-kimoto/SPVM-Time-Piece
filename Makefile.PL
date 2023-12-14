@@ -47,6 +47,7 @@ WriteMakefile(
   },
   PREREQ_PM         => {
     %configure_and_runtime_requires,
+    'SPVM::Sys' => '0.512',
     'SPVM::Time::Local' => '0.110',
   },
   TEST_REQUIRES => {
