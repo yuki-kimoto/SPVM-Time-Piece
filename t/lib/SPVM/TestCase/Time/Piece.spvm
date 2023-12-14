@@ -81,4 +81,56 @@ class TestCase::Time::Piece {
     
     return 1;
   }
+  
+  static method accessors : int () {
+    {
+      my $tp = Time::Piece->strptime("2022-12-13 10:11:56", "%Y-%m-%d %H:%M:%S");
+      
+      unless ($tp->sec == 56) {
+        return 0;
+      }
+      
+      unless ($tp->min == 11) {
+        return 0;
+      }
+      
+      unless ($tp->hour == 10) {
+        return 0;
+      }
+      
+      unless ($tp->mday == 13) {
+        return 0;
+      }
+      
+      unless ($tp->mon == 12) {
+        return 0;
+      }
+      
+      unless ($tp->_mon == 11) {
+        return 0;
+      }
+      
+      unless ($tp->monname eq "Dec") {
+        return 0;
+      }
+      
+      unless ($tp->monname(["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"]) eq "12") {
+        return 0;
+      }
+      
+      unless ($tp->month eq "Dec") {
+        return 0;
+      }
+      
+      unless ($tp->year == 2022) {
+        return 0;
+      }
+      
+    }
+    
+    warn;
+    
+    return 1;
+  }
+  
 }

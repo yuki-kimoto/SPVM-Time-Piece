@@ -34,6 +34,10 @@ ok(SPVM::TestCase::Time::Piece->test);
   ok(SPVM::TestCase::Time::Piece->strftime);
 }
 
+{
+  ok(SPVM::TestCase::Time::Piece->accessors);
+}
+
 # Version check
 {
   my $version_string = SPVM::Fn->get_version_string("Time::Piece");
