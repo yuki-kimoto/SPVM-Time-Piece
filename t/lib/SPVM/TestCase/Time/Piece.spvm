@@ -66,4 +66,19 @@ class TestCase::Time::Piece {
     
     return 1;
   }
+  
+  static method strftime : int () {
+    {
+      my $tp = Time::Piece->strptime("2022-12-13 10:11:56", "%Y-%m-%d %H:%M:%S");
+      
+      my $output = $tp->strftime("%Y-%m-%d %H:%M:%S");
+      
+      unless ($output eq "2022-12-13 10:11:56") {
+        return 0;
+      }
+      
+    }
+    
+    return 1;
+  }
 }

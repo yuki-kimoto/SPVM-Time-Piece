@@ -43,6 +43,10 @@ int32_t SPVM__Time__Piece__strftime(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   strftime(ret, ret_length, format, st_tm);
   
+  int32_t write_length = strlen(ret);
+  
+  env->shorten(env, stack, obj_ret, write_length);
+  
   stack[0].oval = obj_ret;
   
   return 0;
