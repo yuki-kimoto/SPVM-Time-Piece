@@ -36,25 +36,26 @@ class Time::Piece {
     $FULLDAY_LIST = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
   }
   
-  method localtime ($time : long = -1) {
+  # Class Methods
+  static method localtime ($epoch : long = -1) {
     
-    if ($time < 0) {
-      $time = Sys->time;
+    if ($epoch < 0) {
+      $epoch = Sys->time;
     }
     
-    return &_mktime($time, 1);
+    return &_mktime($epoch, 1);
   }
   
-  method gmtime  {
+  static method gmtime ($epoch : long = -1) {
     
-    if ($time < 0) {
-      $time = Sys->time;
+    if ($epoch < 0) {
+      $epoch = Sys->time;
     }
     
-    return &_mktime($time, 0);
+    return &_mktime($epoch, 0);
   }
   
-  method _mktime : Time::Piece ($time : long, $islocal : int) {
+  static method _mktime : Time::Piece ($epoch : long, $islocal : int) {
     
     Sys::Time->tzset;
     
@@ -62,20 +63,31 @@ class Time::Piece {
     
     my $new_tm = (Time::Piece)undef;
     if ($islocal) {
-      $new_tm = Sys->localtime($time);
+      $new_tm = Sys->localtime($epoch);
     }
     else {
-      $new_tm = Sys->gmtime($time);
+      $new_tm = Sys->gmtime($epoch);
     }
     
     $new_tm->{tm} = $new_tm;
     
-    $new_tm->{epoch} = $time;
+    $new_tm->{epoch} = $epoch;
     
     $new_tm->{islocal} = $islocal;
     
     return $new_tp;
   }
+  
+  static method strptime : Time::Piece ($string : string, $format : string) {
+    
+    my $tm = &strptime_tm($string, $format);
+    
+    my $ret_epoch = Time::Local->timegm($ret_tm);
+    
+    return $self->_mktime($ret_epoch, 0);
+  }
+  
+  private native static method strptime_tm : Sys::Time::Tm ($string : string, $format : string);
   
   # Instance Methods
   method sec : int () {
@@ -260,8 +272,8 @@ class Time::Piece {
     return Format->sprintf("%02d$sep%02d$sep%02d", [(object)$self->{tm}{tm_hour}, $self->{tm}{tm_min}, $self->{tm}{tm_sec}]);
   }
   
-  method time : string ($time_sep : string = undef) {
-    return $self->hms($time_sep);
+  method time : string ($sep : string = undef) {
+    return $self->hms($sep);
   }
   
   method ymd : string ($sep : string = undef) {
@@ -402,8 +414,6 @@ class Time::Piece {
   }
   
   native method strftime : string ($format : string);
-  
-  native static method strptime : Time::Piece ($string : string, $format : string) {
   
   method cdate : string () {
     
