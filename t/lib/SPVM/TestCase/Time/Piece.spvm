@@ -50,33 +50,19 @@ class TestCase::Time::Piece {
         return 0;
       }
       
-      warn;
-      
       unless ($tp->hour == 10) {
         return 0;
       }
-      
-      warn;
       
       unless ($tp->min == 11) {
         return 0;
       }
       
-      warn $tp->sec;
-      
-=pod TODO
-
       unless ($tp->sec == 56) {
         return 0;
       }
       
-=cut
-      
-      warn;
-      
     }
-    
-    warn;
     
     return 1;
   }

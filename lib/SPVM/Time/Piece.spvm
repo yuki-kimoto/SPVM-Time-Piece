@@ -88,11 +88,13 @@ class Time::Piece {
   
   static method strptime : Time::Piece ($string : string, $format : string) {
     
-    my $tm = &strptime_tm($string, $format);
+    my $new_tm = &strptime_tm($string, $format);
     
-    my $ret_epoch = Time::Local->timegm($tm);
+    my $new_tp = new Time::Piece;
     
-    return &_mktime($ret_epoch, 0);
+    $new_tp->{tm} = $new_tm;
+    
+    return $new_tp;
   }
   
   private native static method strptime_tm : Sys::Time::Tm ($string : string, $format : string);
@@ -105,7 +107,7 @@ class Time::Piece {
   # Instance Methods
   method sec : int () {
     
-    $self->{tm}->tm_sec;
+    return $self->{tm}->tm_sec;
   }
   
   method second : int () {
