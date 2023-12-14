@@ -82,17 +82,22 @@ class Time::Piece {
     
     my $tm = &strptime_tm($string, $format);
     
-    my $ret_epoch = Time::Local->timegm($ret_tm);
+    my $ret_epoch = Time::Local->timegm($tm);
     
-    return $self->_mktime($ret_epoch, 0);
+    return &_mktime($ret_epoch, 0);
   }
   
   private native static method strptime_tm : Sys::Time::Tm ($string : string, $format : string);
   
+  static method _is_leap_year : int ($year : int) {
+    
+    return (($year %4 == 0) && !($year % 100 == 0)) || ($year % 400 == 0);
+  }
+  
   # Instance Methods
   method sec : int () {
     
-    $self->{tm}{tm_sec};
+    $self->{tm}->tm_sec;
   }
   
   method second : int () {
@@ -102,22 +107,22 @@ class Time::Piece {
   
   method min : int () {
     
-    return $self->{tm}{tm_min};
+    return $self->{tm}->tm_min;
   }
   
   method minute : int () {
     
-    return $self->{tm}{tm_minute};
+    return $self->min;
   }
   
   method hour : int () {
     
-    return $self->{tm}{tm_hour};
+    return $self->{tm}->tm_hour;
   }
   
   method mday : int () {
     
-    return $self->{tm}{tm_mday};
+    return $self->{tm}->tm_mday;
   }
   
   method day_of_month : int () {
@@ -127,21 +132,21 @@ class Time::Piece {
   
   method mon : int () {
     
-    return $self->{tm}{tm_mon} + 1;
+    return $self->{tm}->tm_mon + 1;
   }
   
   method _mon : int () {
     
-    return $self->{tm}{tm_mon};
+    return $self->{tm}->tm_mon;
   }
   
   method month : string ($mon_list : string[] = undef) {
     
     if ($mon_list) {
-      return $mon_list->[$self->{tm}{tm_mon}];
+      return $mon_list->[$self->{tm}->tm_mon];
     }
     else {
-      return $MON_LIST->[$self->{tm}{tm_mon}];
+      return $MON_LIST->[$self->{tm}->tm_mon];
     }
   }
   
@@ -153,26 +158,26 @@ class Time::Piece {
   method fullmonth : string ($mon_list : string[] = undef) {
       
     if ($mon_list) {
-      return $mon_list->[$self->{tm}{tm_mon}];
+      return $mon_list->[$self->{tm}->tm_mon];
     }
     else {
-      return $FULLMON_LIST->[$self->{tm}{tm_mon}];
+      return $FULLMON_LIST->[$self->{tm}->tm_mon];
     }
   }
   
   method year : int () {
     
-    return $self->{tm}{tm_year} + 1900;
+    return $self->{tm}->tm_year + 1900;
   }
   
   method _year : int () {
     
-    return $self->{tm}{tm_year};
+    return $self->{tm}->tm_year;
   }
   
   method yy : string () {
     
-    my $res = $self->{tm}{tm_year} % 100;
+    my $res = $self->{tm}->tm_year % 100;
     
     my $res_string = (string)undef;
     if ($res > 9) {
@@ -187,12 +192,12 @@ class Time::Piece {
   
   method wday : int () {
     
-    return $self->{tm}{tm_wday} + 1;
+    return $self->{tm}->tm_wday + 1;
   }
   
   method _wday : int () {
       
-    $self->{tm}{tm_wday};
+    $self->{tm}->tm_wday;
   }
   
   method day_of_week : int () {
@@ -203,15 +208,15 @@ class Time::Piece {
   method wdayname : string ($day_list : string[] = undef) {
     
     if ($day_list) {
-      return $day_list->[$self->{tm}{tm_wday}];
+      return $day_list->[$self->{tm}->tm_wday];
     }
     else {
-      return $DAY_LIST->[$self->{tm}{tm_wday}];
+      return $DAY_LIST->[$self->{tm}->tm_wday];
     }
   }
   
   
-  method day : int () {
+  method day : string () {
     
     return $self->wdayname;
   }
@@ -219,16 +224,16 @@ class Time::Piece {
   method fullday : string ($day_list : string[] = undef) {
     
     if ($day_list) {
-      return $day_list->[$self->{tm}{tm_wday}];
+      return $day_list->[$self->{tm}->tm_wday];
     }
     else {
-      return $day_list->[$self->{tm}{tm_wday}];
+      return $day_list->[$self->{tm}->tm_wday];
     }
   }
   
   method yday : int () {
     
-    return $self->{tm}{tm_yday};
+    return $self->{tm}->tm_yday;
   }
   
   method day_of_year : int () {
@@ -238,7 +243,7 @@ class Time::Piece {
   
   method isdst : int () {
     
-    return $self->{tm}{tm_isdst};
+    return $self->{tm}->tm_isdst;
   }
   
   method daylight_savings : int () {
@@ -274,7 +279,7 @@ class Time::Piece {
       $sep = $TIME_SEP;
     }
     
-    return Format->sprintf("%02d$sep%02d$sep%02d", [(object)$self->{tm}{tm_hour}, $self->{tm}{tm_min}, $self->{tm}{tm_sec}]);
+    return Format->sprintf("%02d$sep%02d$sep%02d", [(object)$self->{tm}->tm_hour, $self->{tm}->tm_min, $self->{tm}->tm_sec]);
   }
   
   method time : string ($sep : string = undef) {
@@ -287,7 +292,7 @@ class Time::Piece {
       $sep = $DATE_SEP;
     }
     
-    return Format->sprintf("%d$sep%02d$sep%02d", [(object)$self->year, $self->mon, $self->{tm}{tm_mday}]);
+    return Format->sprintf("%d$sep%02d$sep%02d", [(object)$self->year, $self->mon, $self->{tm}->tm_mday]);
   }
   
   method date : string ($sep : string = undef) {
@@ -301,7 +306,7 @@ class Time::Piece {
       $sep = $DATE_SEP;
     }
     
-    return Format->sprintf("%02d$sep%02d$sep%d", [(object)$self->mon, $self->{tm}{tm_mday}, $self->year]);
+    return Format->sprintf("%02d$sep%02d$sep%d", [(object)$self->mon, $self->{tm}->tm_mday, $self->year]);
   }
   
   method dmy : string ($sep : string = undef) {
@@ -310,7 +315,7 @@ class Time::Piece {
       $sep = $DATE_SEP;
     }
     
-    return Format->sprintf("%02d$sep%02d$sep%d", [(object)$self->{tm}{tm_mday}, $self->mon, $self->year]);
+    return Format->sprintf("%02d$sep%02d$sep%d", [(object)$self->{tm}->tm_mday, $self->mon, $self->year]);
   }
   
   method datetime : string () {
@@ -320,13 +325,13 @@ class Time::Piece {
   
   method julian_day : double () {
     
-    my $tm = (Time::Piece)undef;
+    my $tm = (Sys::Time::Tm)undef;
     
     if ($self->{islocal}) {
       $tm = Sys->gmtime($self->epoch);
     }
     else {
-      $tm = $self->tm;
+      $tm = $self->{tm};
     }
     
     my $jd = $self->_jd($tm);
@@ -377,24 +382,19 @@ class Time::Piece {
     # if we are using local time here since we want the week day
     # to reflect the local time rather than UTC
     if ($self->{islocal}) {
-      $J += ($self->tzoffset/(24*3600));
+      $J += ($self->tzoffset->{seconds} / (24*3600));
     }
     
     # Now that we have the Julian day including fractions
     # convert it to an integer Julian Day Number using nearest
     # int (since the day changes at midday we convert all Julian
     # dates to following midnight).
-    $J = (int)($J+0.5);
+    my $J_int = (int)($J+0.5);
     
-    my $d4 = ((($J + 31741 - ($J % 7)) % 146097) % 36524) % 1461;
+    my $d4 = ((($J_int + 31741 - ($J_int % 7)) % 146097) % 36524) % 1461;
     my $L  = $d4 / 1460;
     my $d1 = (($d4 - $L) % 365) + $L;
     return $d1 / 7 + 1;
-  }
-  
-  method _is_leap_year : int ($year : int) {
-    
-    return (($year %4 == 0) && !($year % 100 == 0)) || ($year % 400 == 0);
   }
   
   method is_leap_year : int () {
@@ -428,19 +428,19 @@ class Time::Piece {
   
   method subtract : Time::Piece ($rhs : Time::Seconds) {
     
-    return $self->_mktime(($self->epoch - $rhs->{seconds}), $self->{islocal});
+    return &_mktime(($self->epoch - (long)$rhs->{seconds}), $self->{islocal});
   }
   
   method add : Time::Piece ($rhs : Time::Seconds) {
     
-    return $self->_mktime(($self->epoch + $rhs), $self->{islocal});
+    return &_mktime(($self->epoch + (long)$rhs->{seconds}), $self->{islocal});
   }
   
   method compare : int ($lhs : Time::Piece, $rhs : Time::Piece) {
     return $lhs->{epoch} <=> $rhs->{epoch};
   }
   
-  method add_months : void ($num_months : int) {
+  method add_months : Time::Piece ($num_months : int) {
     
     unless ($num_months) {
       die "\$num_months must be defined.";
@@ -467,14 +467,14 @@ class Time::Piece {
     
     my $ret_tm = Sys->gmtime(0);
     
-    $ret_tm->set_tm_sec($current_tm->sec);
-    $ret_tm->set_tm_min($current_tm->min);
-    $ret_tm->set_tm_hour($current_tm->hour);
-    $ret_tm->set_tm_mday($current_tm->mday);
+    $ret_tm->set_tm_sec($current_tm->tm_sec);
+    $ret_tm->set_tm_min($current_tm->tm_min);
+    $ret_tm->set_tm_hour($current_tm->tm_hour);
+    $ret_tm->set_tm_mday($current_tm->tm_mday);
     $ret_tm->set_tm_mon($final_month);
-    $ret_tm->set_tm_year( $current_tm->year - 1900 + $num_years);
+    $ret_tm->set_tm_year( $current_tm->tm_year - 1900 + $num_years);
     
-    my $ret_epoch = 0;
+    my $ret_epoch = 0L;
     if ($self->{islocal}) {
       $ret_epoch = Time::Local->timelocal($ret_tm);
     }
@@ -482,10 +482,10 @@ class Time::Piece {
       $ret_epoch = Time::Local->timegm($ret_tm);
     }
     
-    return $self->_mktime($ret_epoch, $self->{islocal});
+    return &_mktime($ret_epoch, $self->{islocal});
   }
   
-  method add_years : void ($years : int) {
+  method add_years : Time::Piece ($years : int) {
     $self->add_months($years * 12);
   }
   
@@ -521,9 +521,6 @@ class Time::Piece {
       $ret_tm->set_tm_hour(0);
       $ret_tm->set_tm_mday(1);
     }
-    elsif ($to eq "week") {
-      return $self->_truncate_week;
-    }
     elsif ($to eq "month") {
       $ret_tm->set_tm_sec(0);
       $ret_tm->set_tm_min(0);
@@ -550,7 +547,7 @@ class Time::Piece {
       die "The value of the \"$to\" option is invalid.";
     }
     
-    my $ret_epoch = 0;
+    my $ret_epoch = 0L;
     if ($self->{islocal}) {
       $ret_epoch = Time::Local->timelocal($ret_tm);
     }
@@ -558,6 +555,6 @@ class Time::Piece {
       $ret_epoch = Time::Local->timegm($ret_tm);
     }
     
-    return $self->_mktime($ret_epoch, $self->{islocal});
+    return &_mktime($ret_epoch, $self->{islocal});
   }
 }
