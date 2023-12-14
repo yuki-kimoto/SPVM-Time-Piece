@@ -74,6 +74,7 @@ int32_t SPVM__Time__Piece__strptime_tm(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   struct tm* st_tm = (struct tm*)env->new_memory_block(env, stack, sizeof(struct tm));
   
+  
   std::istringstream string_stream(string);
   
   string_stream >> std::get_time(st_tm, format);

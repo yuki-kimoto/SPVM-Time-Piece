@@ -137,9 +137,11 @@ class TestCase::Time::Piece {
       unless ($tp->yy == 22) {
         return 0;
       }
+      
+      unless ($tp->wday == 3) {
+        return 0;
+      }
     }
-    
-    warn;
     
     return 1;
   }

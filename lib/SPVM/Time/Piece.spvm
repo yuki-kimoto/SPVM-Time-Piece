@@ -94,6 +94,12 @@ class Time::Piece {
     
     $new_tp->{tm} = $new_tm;
     
+    my $epoch = Time::Local->timegm($new_tm);
+    
+    my $wday = &dayofweek($epoch);
+    
+    $new_tp->{tm}->set_tm_wday($wday);
+    
     return $new_tp;
   }
   
@@ -205,6 +211,19 @@ class Time::Piece {
   method day_of_week : int () {
     
     return $self->_wday;
+  }
+  
+  private static method dayofweek : int ($now : long, $tz_offset : int = 0) {
+    # Calculate number of seconds since midnight 1 Jan 1970 local time
+    my $localtime = $now + ($tz_offset * 60 * 60);
+    
+    # Convert to number of days since 1 Jan 1970
+    my $days_since_epoch = $localtime / 86400;
+    
+    # 1 Jan 1970 was a Thursday, so add 4 so Sunday is day 0, and mod 7
+    my $day_of_week = (int)(($days_since_epoch + 4) % 7); 
+    
+    return $day_of_week;
   }
   
   method wdayname : string ($day_list : string[] = undef) {
