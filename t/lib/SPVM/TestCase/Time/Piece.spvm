@@ -234,6 +234,14 @@ class TestCase::Time::Piece {
         return 0;
       }
       
+      unless ($tp->cdate eq "Tue Dec 13 10:11:56 2022") {
+        return 0;
+      }
+      
+      unless ($tp->epoch == 1670926316) {
+        return 0;
+      }
+      
     }
     
     return 1;
