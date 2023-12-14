@@ -1,6 +1,35 @@
 class TestCase::Time::Piece {
+  
+  use Sys;
   use Time::Piece;
+  
   static method test : int () {
+    
+    return 1;
+  }
+  
+  static method localtime : int () {
+    
+    {
+      my $tp = Time::Piece->localtime;
+    }
+    
+    {
+      my $tp = Time::Piece->localtime(Sys->time);
+    }
+    
+    return 1;
+  }
+  
+  static method gmtime : int () {
+    
+    {
+      my $tp = Time::Piece->gmtime;
+    }
+    
+    {
+      my $tp = Time::Piece->gmtime(Sys->time);
+    }
     
     return 1;
   }
