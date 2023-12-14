@@ -141,6 +141,15 @@ class TestCase::Time::Piece {
       unless ($tp->wday == 3) {
         return 0;
       }
+      
+      unless ($tp->_wday == 2) {
+        return 0;
+      }
+      
+      unless ($tp->day_of_week == 2) {
+        return 0;
+      }
+      
     }
     
     return 1;

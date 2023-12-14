@@ -205,7 +205,7 @@ class Time::Piece {
   
   method _wday : int () {
       
-    $self->{tm}->tm_wday;
+    return $self->{tm}->tm_wday;
   }
   
   method day_of_week : int () {
