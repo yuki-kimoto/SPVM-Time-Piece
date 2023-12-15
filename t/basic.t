@@ -58,6 +58,10 @@ ok(SPVM::TestCase::Time::Piece->test);
   ok(SPVM::TestCase::Time::Piece->is_leap_year);
 }
 
+{
+  ok(SPVM::TestCase::Time::Piece->month_last_day);
+}
+
 # Version check
 {
   my $version_string = SPVM::Fn->get_version_string("Time::Piece");

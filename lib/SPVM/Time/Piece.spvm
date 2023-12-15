@@ -37,7 +37,7 @@ class Time::Piece {
   }
   
   # Class Methods
-  static method localtime : Time::Piece ($epoch : long = -1) {
+  static method localtime : Time::Piece ($epoch : long = -1L) {
     
     if ($epoch < 0) {
       $epoch = Sys->time;
@@ -56,7 +56,7 @@ class Time::Piece {
     return $new_tp;
   }
   
-  static method gmtime : Time::Piece ($epoch : long = -1) {
+  static method gmtime : Time::Piece ($epoch : long = -1L) {
     
     if ($epoch < 0) {
       $epoch = Sys->time;
@@ -453,6 +453,9 @@ class Time::Piece {
     if ($_mon == 1) {
       $add_leap_year = &_is_leap_year($year);
     }
+    
+    warn $year;
+    warn $_mon;
     
     return $MON_LAST->[$_mon] + $add_leap_year;
   }

@@ -324,4 +324,17 @@ class TestCase::Time::Piece {
     
     return 1;
   }
+  
+  static method month_last_day : int () {
+    
+    {
+      my $tp = Time::Piece->gmtime;
+      
+      my $month_last_day = $tp->month_last_day;
+      
+      warn "[Test Output]month_last_day:$month_last_day";
+    }
+    
+    return 1;
+  }
 }
