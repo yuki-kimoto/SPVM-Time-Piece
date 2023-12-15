@@ -69,6 +69,33 @@ class Time::Piece {
     return $new_tp;
   }
   
+  static method localtime_tp : Time::Piece ($tp : Time::Piece) {
+    
+    unless ($tp) {
+      die "\$tp must be defined.";
+    }
+    
+    my $new_tp = new Time::Piece;
+    
+    my $new_tm = Sys::Time::Tm->new;
+    
+    $new_tm->set_tm_sec($tp->{tm}->tm_sec);
+    $new_tm->set_tm_min($tp->{tm}->tm_min);
+    $new_tm->set_tm_hour($tp->{tm}->tm_hour);
+    $new_tm->set_tm_mday($tp->{tm}->tm_mday);
+    $new_tm->set_tm_mon($tp->{tm}->tm_mon);
+    $new_tm->set_tm_year($tp->{tm}->tm_year);
+    $new_tm->set_tm_wday($tp->{tm}->tm_wday);
+    $new_tm->set_tm_yday($tp->{tm}->tm_yday);
+    $new_tm->set_tm_isdst($tp->{tm}->tm_isdst);
+    
+    $new_tp->{tm} = $new_tm;
+    
+    $new_tp->{epoch} = Time::Local->timelocal($new_tm);
+    
+    return $new_tp;
+  }
+  
   static method gmtime : Time::Piece ($epoch : long = -1L) {
     
     my $new_tp = &new($epoch, 0);

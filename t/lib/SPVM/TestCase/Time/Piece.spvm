@@ -362,4 +362,19 @@ class TestCase::Time::Piece {
     return 1;
   }
   
+  static method localtime_tp : int () {
+    {
+      my $tp = Time::Piece->strptime("2022-12-13 10:11:56", "%Y-%m-%d %H:%M:%S");
+      
+      my $tp_localtime = Time::Piece->localtime_tp($tp);
+      
+      warn $tp_localtime->strftime;
+      
+      unless (Fn->contains($tp_localtime->strftime, "10:11:56")) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
 }
