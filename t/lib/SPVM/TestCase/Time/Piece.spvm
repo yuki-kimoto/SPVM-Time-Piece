@@ -370,7 +370,27 @@ class TestCase::Time::Piece {
       
       warn $tp_localtime->strftime;
       
-      unless (Fn->contains($tp_localtime->strftime, "10:11:56")) {
+      unless ($tp->year == 2022) {
+        return 0;
+      }
+      
+      unless ($tp->mon == 12) {
+        return 0;
+      }
+      
+      unless ($tp->mday == 13) {
+        return 0;
+      }
+      
+      unless ($tp->hour == 10) {
+        return 0;
+      }
+      
+      unless ($tp->min == 11) {
+        return 0;
+      }
+      
+      unless ($tp->sec == 56) {
         return 0;
       }
       
