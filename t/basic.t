@@ -46,6 +46,10 @@ ok(SPVM::TestCase::Time::Piece->test);
   ok(SPVM::TestCase::Time::Piece->julian_day);
 }
 
+{
+  ok(SPVM::TestCase::Time::Piece->mjd);
+}
+
 # Version check
 {
   my $version_string = SPVM::Fn->get_version_string("Time::Piece");

@@ -285,4 +285,17 @@ class TestCase::Time::Piece {
     
     return 1;
   }
+  
+  static method mjd : int () {
+    
+    {
+      my $tp = Time::Piece->gmtime;
+      
+      my $mjd = $tp->mjd;
+      
+      warn "[Test Output]mjd:" . Format->sprintf("%.10f", [(object)$mjd]);
+    }
+    
+    return 1;
+  }
 }
