@@ -25,7 +25,8 @@ int32_t SPVM__Time__Piece__strftime(SPVM_ENV* env, SPVM_VALUE* stack) {
   void* obj_format = stack[1].oval;
   
   if (!obj_format) {
-    return env->die(env, stack, "$format must be defined.", __func__, FILE_NAME, __LINE__);
+    const char* format = "%a, %d %b %Y %H:%M:%S %Z";
+    obj_format = env->new_string(env, stack, format, strlen(format));
   }
   
   const char* format = env->get_chars(env, stack, obj_format);

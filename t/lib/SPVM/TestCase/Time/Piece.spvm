@@ -310,6 +310,14 @@ class TestCase::Time::Piece {
       warn "[Test Output]strftime:$strftime";
     }
     
+    {
+      my $tp = Time::Piece->gmtime;
+      
+      my $strftime = $tp->strftime;
+      
+      warn "[Test Output]strftime:$strftime";
+    }
+    
     return 1;
   }
   

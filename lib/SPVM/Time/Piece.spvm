@@ -442,7 +442,7 @@ class Time::Piece {
     return $MON_LAST->[$_mon] + $add_leap_year;
   }
   
-  native method strftime : string ($format : string);
+  native method strftime : string ($format : string = undef);
   
   method cdate : string () {
     
