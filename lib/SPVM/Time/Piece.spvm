@@ -77,7 +77,7 @@ class Time::Piece {
     
     my $new_tp = new Time::Piece;
     
-    my $new_tm = Sys::Time::Tm->new;
+    my $new_tm = Sys->localtime(0);
     
     $new_tm->set_tm_sec($tp->{tm}->tm_sec);
     $new_tm->set_tm_min($tp->{tm}->tm_min);
