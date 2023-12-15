@@ -27,10 +27,6 @@ ok(SPVM::TestCase::Time::Piece->test);
 }
 
 {
-  ok(SPVM::TestCase::Time::Piece->strptime);
-}
-
-{
   ok(SPVM::TestCase::Time::Piece->strftime);
 }
 
@@ -64,6 +60,10 @@ ok(SPVM::TestCase::Time::Piece->test);
 
 {
   ok(SPVM::TestCase::Time::Piece->strftime);
+}
+
+{
+  ok(SPVM::TestCase::Time::Piece->strptime);
 }
 
 # Version check
