@@ -420,7 +420,7 @@ class Time::Piece {
     # if we are using local time here since we want the week day
     # to reflect the local time rather than UTC
     if ($self->{is_localtime}) {
-      $J += ($self->tzoffset->{seconds} / (24*3600));
+      $J += ((double)$self->tzoffset->{seconds} / (24*3600));
     }
     
     # Now that we have the Julian day including fractions

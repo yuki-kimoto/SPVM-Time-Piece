@@ -50,6 +50,10 @@ ok(SPVM::TestCase::Time::Piece->test);
   ok(SPVM::TestCase::Time::Piece->mjd);
 }
 
+{
+  ok(SPVM::TestCase::Time::Piece->week);
+}
+
 # Version check
 {
   my $version_string = SPVM::Fn->get_version_string("Time::Piece");

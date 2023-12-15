@@ -298,4 +298,17 @@ class TestCase::Time::Piece {
     
     return 1;
   }
+  
+  static method week : int () {
+    
+    {
+      my $tp = Time::Piece->gmtime;
+      
+      my $week = $tp->week;
+      
+      warn "[Test Output]week:$week";
+    }
+    
+    return 1;
+  }
 }
