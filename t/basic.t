@@ -62,6 +62,10 @@ ok(SPVM::TestCase::Time::Piece->test);
   ok(SPVM::TestCase::Time::Piece->month_last_day);
 }
 
+{
+  ok(SPVM::TestCase::Time::Piece->strftime);
+}
+
 # Version check
 {
   my $version_string = SPVM::Fn->get_version_string("Time::Piece");

@@ -68,21 +68,6 @@ class TestCase::Time::Piece {
     return 1;
   }
   
-  static method strftime : int () {
-    {
-      my $tp = Time::Piece->strptime("2022-12-13 10:11:56", "%Y-%m-%d %H:%M:%S");
-      
-      my $output = $tp->strftime("%Y-%m-%d %H:%M:%S");
-      
-      unless ($output eq "2022-12-13 10:11:56") {
-        return 0;
-      }
-      
-    }
-    
-    return 1;
-  }
-  
   static method accessors : int () {
     {
       my $tp = Time::Piece->strptime("2022-12-13 10:11:56", "%Y-%m-%d %H:%M:%S");
@@ -337,4 +322,28 @@ class TestCase::Time::Piece {
     
     return 1;
   }
+  
+  static method strftime : int () {
+    {
+      my $tp = Time::Piece->strptime("2022-12-13 10:11:56", "%Y-%m-%d %H:%M:%S");
+      
+      my $output = $tp->strftime("%Y-%m-%d %H:%M:%S");
+      
+      unless ($output eq "2022-12-13 10:11:56") {
+        return 0;
+      }
+      
+    }
+    
+    {
+      my $tp = Time::Piece->gmtime;
+      
+      my $strftime = $tp->strftime("%a %A %b %B %c %C %d %D %e %F %G %g %h %H ") . $tp->strftime("%I %j %k %l %m %M %n %p %P %r %R %s %S %t %T %u %U ") . $tp->strftime("%V %w %W %x %X %y %Y %z %Z %+ %Ec, %EC, %Ex ") . $tp->strftime("%EX, %Ey, %EY, %Od, %Oe, %OH, %OI, %Om, %OM, %OS, %Ou, %OU, %OV, %Ow, %OW, %Oy %%");
+      
+      warn "[Test Output]strftime:$strftime";
+    }
+    
+    return 1;
+  }
+  
 }

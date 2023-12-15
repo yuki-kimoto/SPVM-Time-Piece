@@ -37,7 +37,7 @@ int32_t SPVM__Time__Piece__strftime(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t ret_length = 128;
   
-  void* obj_ret = env->new_string(env, stack, NULL, 128);
+  void* obj_ret = env->new_string(env, stack, NULL, ret_length);
   
   char* ret = (char*)env->get_chars(env, stack, obj_ret);
   
