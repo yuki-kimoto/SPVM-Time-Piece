@@ -37,43 +37,11 @@ class Time::Piece {
   }
   
   # Class Methods
-  static method localtime : Time::Piece ($epoch : long = -1L) {
+  private static method new : Time::Piece ($epoch : long = -1L, $is_localtime : int = 0) {
     
     if ($epoch < 0) {
       $epoch = Sys->time;
     }
-    
-    my $new_tp = new Time::Piece;
-    
-    my $new_tm = Sys->localtime($epoch);
-    
-    $new_tp->{tm} = $new_tm;
-    
-    $new_tp->{is_localtime} = 1;
-    
-    $new_tp->{epoch} = $epoch;
-    
-    return $new_tp;
-  }
-  
-  static method gmtime : Time::Piece ($epoch : long = -1L) {
-    
-    if ($epoch < 0) {
-      $epoch = Sys->time;
-    }
-    
-    my $new_tp = new Time::Piece;
-    
-    my $new_tm = Sys->gmtime($epoch);
-    
-    $new_tp->{tm} = $new_tm;
-    
-    $new_tp->{epoch} = $epoch;
-    
-    return $new_tp;
-  }
-  
-  private static method _mktime : Time::Piece ($epoch : long, $is_localtime : int) {
     
     my $new_tp = new Time::Piece;
     
@@ -90,6 +58,20 @@ class Time::Piece {
     $new_tp->{is_localtime} = (byte)$is_localtime;
     
     $new_tp->{epoch} = $epoch;
+    
+    return $new_tp;
+  }
+  
+  static method localtime : Time::Piece ($epoch : long = -1L) {
+    
+    my $new_tp = &new($epoch, 1);
+    
+    return $new_tp;
+  }
+  
+  static method gmtime : Time::Piece ($epoch : long = -1L) {
+    
+    my $new_tp = &new($epoch, 0);
     
     return $new_tp;
   }
@@ -469,12 +451,12 @@ class Time::Piece {
   
   method subtract : Time::Piece ($rhs : Time::Seconds) {
     
-    return &_mktime(($self->epoch - (long)$rhs->{seconds}), $self->{is_localtime});
+    return &new(($self->epoch - (long)$rhs->{seconds}), $self->{is_localtime});
   }
   
   method add : Time::Piece ($rhs : Time::Seconds) {
     
-    return &_mktime(($self->epoch + (long)$rhs->{seconds}), $self->{is_localtime});
+    return &new(($self->epoch + (long)$rhs->{seconds}), $self->{is_localtime});
   }
   
   method compare : int ($lhs : Time::Piece, $rhs : Time::Piece) {
@@ -523,7 +505,7 @@ class Time::Piece {
       $ret_epoch = Time::Local->timegm($ret_tm);
     }
     
-    return &_mktime($ret_epoch, $self->{is_localtime});
+    return &new($ret_epoch, $self->{is_localtime});
   }
   
   method add_years : Time::Piece ($years : int) {
@@ -596,6 +578,6 @@ class Time::Piece {
       $ret_epoch = Time::Local->timegm($ret_tm);
     }
     
-    return &_mktime($ret_epoch, $self->{is_localtime});
+    return &new($ret_epoch, $self->{is_localtime});
   }
 }
