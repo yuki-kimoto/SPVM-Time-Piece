@@ -311,4 +311,17 @@ class TestCase::Time::Piece {
     
     return 1;
   }
+  
+  static method is_leap_year : int () {
+    
+    {
+      my $tp = Time::Piece->gmtime;
+      
+      my $is_leap_year = $tp->is_leap_year;
+      
+      warn "[Test Output]week:$is_leap_year";
+    }
+    
+    return 1;
+  }
 }
