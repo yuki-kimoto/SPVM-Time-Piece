@@ -395,6 +395,14 @@ class TestCase::Time::Piece {
       }
       
       warn "[Test Output]localtime_tp:\$tp->epoch:" . $tp->epoch . ":\$tp_localtime->epoch:" . $tp_localtime->epoch;
+      
+      my $epoch_diff = $tp->epoch - $tp_localtime->epoch;
+      
+      my $epoch_diff_hour = $epoch_diff / 60 / 60;
+      
+      unless ($epoch_diff_hour == 9) {
+        return 0;
+      }
     }
     
     return 1;
