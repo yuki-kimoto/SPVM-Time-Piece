@@ -430,9 +430,79 @@ class TestCase::Time::Piece {
       
       my $tp_truncate = $tp->truncate({to => "second"});
       
-      warn $tp_truncate->strftime("%Y-%m-%d %S:%M:%H");
-      
       unless ($tp_truncate->strftime("%Y-%m-%d %H:%M:%S") eq "2022-12-13 10:11:00") {
+        return 0;
+      }
+    }
+    
+    {
+      my $tp = Time::Piece->localtime_tp(Time::Piece->strptime("2022-12-13 10:11:56", "%Y-%m-%d %H:%M:%S"));
+      
+      my $tp_truncate = $tp->truncate({to => "minute"});
+      
+      unless ($tp_truncate->strftime("%Y-%m-%d %H:%M:%S") eq "2022-12-13 10:00:00") {
+        return 0;
+      }
+    }
+    
+    {
+      my $tp = Time::Piece->localtime_tp(Time::Piece->strptime("2022-12-13 10:11:56", "%Y-%m-%d %H:%M:%S"));
+      
+      my $tp_truncate = $tp->truncate({to => "hour"});
+      
+      unless ($tp_truncate->strftime("%Y-%m-%d %H:%M:%S") eq "2022-12-13 00:00:00") {
+        return 0;
+      }
+    }
+    
+    {
+      my $tp = Time::Piece->localtime_tp(Time::Piece->strptime("2022-12-13 10:11:56", "%Y-%m-%d %H:%M:%S"));
+      
+      my $tp_truncate = $tp->truncate({to => "day"});
+      
+      unless ($tp_truncate->strftime("%Y-%m-%d %H:%M:%S") eq "2022-12-01 00:00:00") {
+        return 0;
+      }
+    }
+    
+    {
+      my $tp = Time::Piece->localtime_tp(Time::Piece->strptime("2022-12-13 10:11:56", "%Y-%m-%d %H:%M:%S"));
+      
+      my $tp_truncate = $tp->truncate({to => "day"});
+      
+      unless ($tp_truncate->strftime("%Y-%m-%d %H:%M:%S") eq "2022-12-01 00:00:00") {
+        return 0;
+      }
+    }
+    
+    {
+      my $tp = Time::Piece->localtime_tp(Time::Piece->strptime("2022-12-13 10:11:56", "%Y-%m-%d %H:%M:%S"));
+      
+      my $tp_truncate = $tp->truncate({to => "month"});
+      
+      unless ($tp_truncate->strftime("%Y-%m-%d %H:%M:%S") eq "2022-01-01 00:00:00") {
+        return 0;
+      }
+    }
+    
+    {
+      my $tp = Time::Piece->localtime_tp(Time::Piece->strptime("2022-12-13 10:11:56", "%Y-%m-%d %H:%M:%S"));
+      
+      my $tp_truncate = $tp->truncate({to => "quarter"});
+      
+      unless ($tp_truncate->strftime("%Y-%m-%d %H:%M:%S") eq "2022-10-01 00:00:00") {
+        return 0;
+      }
+    }
+    
+    {
+      my $tp = Time::Piece->localtime_tp(Time::Piece->strptime("2022-12-13 10:11:56", "%Y-%m-%d %H:%M:%S"));
+      
+      my $tp_truncate = $tp->truncate({to => "year"});
+      
+      warn $tp_truncate->cdate;
+      
+      unless ($tp_truncate->strftime("%Y-%m-%d %H:%M:%S") eq "2022-01-01 00:00:00") {
         return 0;
       }
     }

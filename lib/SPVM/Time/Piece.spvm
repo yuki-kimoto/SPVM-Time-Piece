@@ -590,7 +590,7 @@ class Time::Piece {
       $tm->set_tm_hour(0);
       $tm->set_tm_mday(1);
       $tm->set_tm_mon(0);
-      $tm->set_tm_year($self->year);
+      $tm->set_tm_year($self->_year);
     }
     else {
       die "The value of the \"$to\" option is invalid.";
