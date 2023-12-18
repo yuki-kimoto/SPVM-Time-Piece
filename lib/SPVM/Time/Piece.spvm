@@ -548,69 +548,65 @@ class Time::Piece {
       die "The \"to\" option must be defined.";
     }
     
-    my $ret_tm = (Sys::Time::Tm)undef;
-    if ($self->{is_localtime}) {
-      $ret_tm = Sys->localtime(0);
-    }
-    else {
-      $ret_tm = Sys->gmtime(0);
-    }
+    my $tp_truncate = $self->clone;
+    
+    my $tm = $tp_truncate->{tm};
     
     if ($to eq "second") {
-      $ret_tm->set_tm_sec(0);
+      $tm->set_tm_sec(0);
     }
     elsif ($to eq "minute") {
-      $ret_tm->set_tm_sec(0);
-      $ret_tm->set_tm_min(0);
+      $tm->set_tm_sec(0);
+      $tm->set_tm_min(0);
     }
     elsif ($to eq "hour") {
-      $ret_tm->set_tm_sec(0);
-      $ret_tm->set_tm_min(0);
-      $ret_tm->set_tm_hour(0);
+      $tm->set_tm_sec(0);
+      $tm->set_tm_min(0);
+      $tm->set_tm_hour(0);
     }
     elsif ($to eq "day") {
-      $ret_tm->set_tm_sec(0);
-      $ret_tm->set_tm_min(0);
-      $ret_tm->set_tm_hour(0);
-      $ret_tm->set_tm_mday(1);
+      $tm->set_tm_sec(0);
+      $tm->set_tm_min(0);
+      $tm->set_tm_hour(0);
+      $tm->set_tm_mday(1);
     }
     elsif ($to eq "month") {
-      $ret_tm->set_tm_sec(0);
-      $ret_tm->set_tm_min(0);
-      $ret_tm->set_tm_hour(0);
-      $ret_tm->set_tm_mday(1);
-      $ret_tm->set_tm_mon(0);
+      $tm->set_tm_sec(0);
+      $tm->set_tm_min(0);
+      $tm->set_tm_hour(0);
+      $tm->set_tm_mday(1);
+      $tm->set_tm_mon(0);
     }
     elsif ($to eq "quarter") {
-      $ret_tm->set_tm_sec(0);
-      $ret_tm->set_tm_min(0);
-      $ret_tm->set_tm_hour(0);
-      $ret_tm->set_tm_mday(1);
-      $ret_tm->set_tm_mon(($self->_mon / 3) * 3);
+      $tm->set_tm_sec(0);
+      $tm->set_tm_min(0);
+      $tm->set_tm_hour(0);
+      $tm->set_tm_mday(1);
+      $tm->set_tm_mon(($self->_mon / 3) * 3);
     }
     elsif ($to eq "year") {
-      $ret_tm->set_tm_sec(0);
-      $ret_tm->set_tm_min(0);
-      $ret_tm->set_tm_hour(0);
-      $ret_tm->set_tm_mday(1);
-      $ret_tm->set_tm_mon(0);
-      $ret_tm->set_tm_year($self->year);
+      $tm->set_tm_sec(0);
+      $tm->set_tm_min(0);
+      $tm->set_tm_hour(0);
+      $tm->set_tm_mday(1);
+      $tm->set_tm_mon(0);
+      $tm->set_tm_year($self->year);
     }
     else {
       die "The value of the \"$to\" option is invalid.";
     }
     
-    my $ret_epoch = 0L;
-    if ($self->{is_localtime}) {
-      $ret_epoch = Time::Local->timelocal($ret_tm);
+    my $epoch = 0L;
+    if ($tp_truncate->{is_localtime}) {
+      $epoch = Time::Local->timelocal($tm);
     }
     else {
-      $ret_epoch = Time::Local->timegm($ret_tm);
+      $epoch = Time::Local->timegm($tm);
     }
     
-    $self->{epoch} = $ret_epoch;
+    $tp_truncate->{epoch} = $epoch;
     
-    return &new($ret_epoch, $self->{is_localtime});
+    return $tp_truncate;
   }
   
   method clone : Time::Piece () {
@@ -619,4 +615,5 @@ class Time::Piece {
     
     return $clone_tp;
   }
+  
 }

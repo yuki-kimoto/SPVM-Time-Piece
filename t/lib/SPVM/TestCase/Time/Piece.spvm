@@ -422,4 +422,21 @@ class TestCase::Time::Piece {
     
     return 1;
   }
+  
+  static method truncate : int () {
+    
+    {
+      my $tp = Time::Piece->localtime_tp(Time::Piece->strptime("2022-12-13 10:11:56", "%Y-%m-%d %H:%M:%S"));
+      
+      my $tp_truncate = $tp->truncate({to => "second"});
+      
+      warn $tp_truncate->strftime("%Y-%m-%d %S:%M:%H");
+      
+      unless ($tp_truncate->strftime("%Y-%m-%d %H:%M:%S") eq "2022-12-13 10:11:00") {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
 }
