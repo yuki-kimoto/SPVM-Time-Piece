@@ -473,18 +473,18 @@ class Time::Piece {
     return $self->strftime("%a %b %d %H:%M:%S %Y");
   }
   
-  method add : Time::Piece ($rhs : Time::Seconds) {
+  method add : Time::Piece ($tsec : Time::Seconds) {
     
-    return &new(($self->{epoch} + (long)$rhs->{seconds}), $self->{is_localtime});
+    return &new($self->{epoch} + (long)$tsec->{seconds}, $self->{is_localtime});
   }
   
-  method subtract : Time::Piece ($rhs : Time::Seconds) {
+  method subtract : Time::Piece ($tsec : Time::Seconds) {
     
-    return &new(($self->{epoch} - (long)$rhs->{seconds}), $self->{is_localtime});
+    return &new($self->{epoch} - (long)$tsec->{seconds}, $self->{is_localtime});
   }
   
-  method compare : int ($rhs : Time::Piece) {
-    return $self->{epoch} <=> $rhs->epoch;
+  method compare : int ($tp : Time::Piece) {
+    return $self->{epoch} <=> $tp->epoch;
   }
   
   method add_months : Time::Piece ($num_months : int) {
