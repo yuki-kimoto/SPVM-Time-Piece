@@ -296,7 +296,7 @@ class Time::Piece {
       return Time::Seconds->new(0);
     }
     
-    my $epoch = $self->epoch;
+    my $epoch = $self->{epoch};
     
     my $jd_localtime = $self->_jd(Sys->localtime($epoch));
     
@@ -369,7 +369,7 @@ class Time::Piece {
     my $tm = (Sys::Time::Tm)undef;
     
     if ($self->{is_localtime}) {
-      $tm = Sys->gmtime($self->epoch);
+      $tm = Sys->gmtime($self->{epoch});
     }
     else {
       $tm = $self->{tm};
@@ -473,18 +473,18 @@ class Time::Piece {
     return $self->strftime("%a %b %d %H:%M:%S %Y");
   }
   
-  method subtract : Time::Piece ($rhs : Time::Seconds) {
-    
-    return &new(($self->epoch - (long)$rhs->{seconds}), $self->{is_localtime});
-  }
-  
   method add : Time::Piece ($rhs : Time::Seconds) {
     
-    return &new(($self->epoch + (long)$rhs->{seconds}), $self->{is_localtime});
+    return &new(($self->{epoch} + (long)$rhs->{seconds}), $self->{is_localtime});
   }
   
-  method compare : int ($lhs : Time::Piece, $rhs : Time::Piece) {
-    return $lhs->epoch <=> $rhs->epoch;
+  method subtract : Time::Piece ($rhs : Time::Seconds) {
+    
+    return &new(($self->{epoch} - (long)$rhs->{seconds}), $self->{is_localtime});
+  }
+  
+  method compare : int ($rhs : Time::Piece) {
+    return $self->{epoch} <=> $rhs->epoch;
   }
   
   method add_months : Time::Piece ($num_months : int) {
