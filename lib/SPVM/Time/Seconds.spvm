@@ -4,6 +4,8 @@
 class Time::Seconds {
   allow Time::Piece;
   
+  use StringBuffer;
+  
   # Fields
   has seconds : ro long;
   
@@ -17,23 +19,23 @@ class Time::Seconds {
     return $self;
   }
   
-  static method ONE_MINUTE : long () { return 60d; }
+  static method ONE_MINUTE : long () { return 60; }
   
-  static method ONE_HOUR : long () { return 3_600d; }
+  static method ONE_HOUR : long () { return 3_600; }
   
-  static method ONE_DAY : long () { return 86_400d; }
+  static method ONE_DAY : long () { return 86_400; }
   
-  static method ONE_WEEK : long () { return 604_800d; }
+  static method ONE_WEEK : long () { return 604_800; }
   
-  static method ONE_MONTH : long () { return 2_629_744d; } # ONE_YEAR / 12
+  static method ONE_MONTH : long () { return 2_629_744; } # ONE_YEAR / 12
   
-  static method ONE_YEAR : long () { return 31_556_930d; } # 365.24225 days
+  static method ONE_YEAR : long () { return 31_556_930; } # 365.24225 days
   
-  static method ONE_FINANCIAL_MONTH : long () { return 2_592_000d; } # 30 days
+  static method ONE_FINANCIAL_MONTH : long () { return 2_592_000; } # 30 days
   
-  static method LEAP_YEAR : long () { return 31_622_400d; } # 366 * ONE_DAY
+  static method LEAP_YEAR : long () { return 31_622_400; } # 366 * ONE_DAY
   
-  static method NON_LEAP_YEAR : long () { return 31_536_000d; } # 365 * ONE_DAY
+  static method NON_LEAP_YEAR : long () { return 31_536_000; } # 365 * ONE_DAY
   
   # Instance Methods
   method add : Time::Seconds ($seconds : long) {
@@ -83,7 +85,7 @@ class Time::Seconds {
   }
    
   method financial_months : double () {
-    return self->days / 30.0;
+    return $self->days / 30.0;
   }
   
   method years : double () {
@@ -92,6 +94,54 @@ class Time::Seconds {
   
   method clone : Time::Seconds () {
     return $self->copy;
+  }
+  
+  method pretty : string () {
+    my $seconds = $self->{seconds};
+    
+    my $buffer = StringBuffer->new;
+    
+    if ($seconds < 0) {
+      $seconds = -$seconds;
+      $buffer->push("minus ");
+    }
+    if ($seconds >= &ONE_MINUTE) {
+      if ($seconds >= &ONE_HOUR) {
+        if ($seconds >= &ONE_DAY) {
+          my $days_floor = (int)$self->days;
+          $buffer->push($days_floor);
+          unless ($days_floor == 1) {
+            $buffer->push("s");
+          }
+          $buffer->push(" ,");
+          
+          $seconds -= ($days_floor * &ONE_DAY);
+        }
+        my $hours_floor = (int)$self->hours;
+        $buffer->push($hours_floor);
+        unless ($hours_floor == 1) {
+          $buffer->push("s");
+        }
+        $buffer->push(" ,");
+        $seconds -= ($hours_floor * &ONE_HOUR);
+      }
+      my $mins_floor = (int)$self->minutes;
+      $buffer->push($mins_floor);
+      unless ($mins_floor == 1) {
+        $buffer->push("s");
+      }
+      $buffer->push(" ,");
+      $seconds -= ($mins_floor * &ONE_MINUTE);
+    }
+    
+    $buffer->push($seconds);
+    unless ($seconds == 1) {
+      $buffer->push("s");
+    }
+    
+    my $string = $buffer->to_string;
+    
+    return $string;
   }
   
 }
