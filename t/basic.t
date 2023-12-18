@@ -70,6 +70,10 @@ ok(SPVM::TestCase::Time::Piece->test);
   ok(SPVM::TestCase::Time::Piece->localtime_tp);
 }
 
+{
+  ok(SPVM::TestCase::Time::Piece->clone);
+}
+
 # Version check
 {
   my $version_string = SPVM::Fn->get_version_string("Time::Piece");

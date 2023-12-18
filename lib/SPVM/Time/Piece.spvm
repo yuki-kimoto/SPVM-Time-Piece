@@ -75,7 +75,7 @@ class Time::Piece {
       die "\$tp must be defined.";
     }
     
-    my $new_tp = new Time::Piece;
+    my $new_tp = &new(0, 1);
     
     my $new_tm = Sys->localtime(0);
     
@@ -107,7 +107,7 @@ class Time::Piece {
     
     my $new_tm = &strptime_tm($string, $format);
     
-    my $new_tp = new Time::Piece;
+    my $new_tp = &new(0, 0);
     
     $new_tp->{tm} = $new_tm;
     
@@ -463,9 +463,6 @@ class Time::Piece {
       $add_leap_year = &_is_leap_year($year);
     }
     
-    warn $year;
-    warn $_mon;
-    
     return $MON_LAST->[$_mon] + $add_leap_year;
   }
   
@@ -551,7 +548,13 @@ class Time::Piece {
       die "The \"to\" option must be defined.";
     }
     
-    my $ret_tm = Sys->gmtime(0);
+    my $ret_tm = (Sys::Time::Tm)undef;
+    if ($self->{is_localtime}) {
+      $ret_tm = Sys->localtime(0);
+    }
+    else {
+      $ret_tm = Sys->gmtime(0);
+    }
     
     if ($to eq "second") {
       $ret_tm->set_tm_sec(0);
@@ -605,6 +608,15 @@ class Time::Piece {
       $ret_epoch = Time::Local->timegm($ret_tm);
     }
     
+    $self->{epoch} = $ret_epoch;
+    
     return &new($ret_epoch, $self->{is_localtime});
+  }
+  
+  method clone : Time::Piece () {
+    
+    my $clone_tp = &new($self->{epoch}, $self->{is_localtime});
+    
+    return $clone_tp;
   }
 }

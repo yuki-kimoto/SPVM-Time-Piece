@@ -407,4 +407,19 @@ class TestCase::Time::Piece {
     
     return 1;
   }
+  
+  static method clone : int () {
+    
+    {
+      my $tp = Time::Piece->localtime_tp(Time::Piece->strptime("2022-12-13 10:11:56", "%Y-%m-%d %H:%M:%S"));
+      
+      my $tp_clone = $tp->clone;
+      
+      unless ($tp_clone->strftime("%Y-%m-%d %H:%M:%S") eq "2022-12-13 10:11:56") {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
 }
