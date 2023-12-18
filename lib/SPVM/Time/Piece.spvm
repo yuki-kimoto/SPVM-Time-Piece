@@ -478,9 +478,27 @@ class Time::Piece {
     return &new($self->{epoch} + (long)$tsec->{seconds}, $self->{is_localtime});
   }
   
+  method add_to : Time::Piece ($tsec : Time::Seconds) {
+    
+    my $tp_add = &new($self->{epoch} + (long)$tsec->{seconds}, $self->{is_localtime});
+    
+    $self->{tm} = $tp_add->{tm};
+    
+    $self->{epoch} = $tp_add->{epoch};
+  }
+  
   method subtract : Time::Piece ($tsec : Time::Seconds) {
     
     return &new($self->{epoch} - (long)$tsec->{seconds}, $self->{is_localtime});
+  }
+  
+  method subtract_from : Time::Piece ($tsec : Time::Seconds) {
+    
+    my $tp_subtract = &new($self->{epoch} - (long)$tsec->{seconds}, $self->{is_localtime});
+    
+    $self->{tm} = $tp_subtract->{tm};
+    
+    $self->{epoch} = $tp_subtract->{epoch};
   }
   
   method compare : int ($tp : Time::Piece) {
