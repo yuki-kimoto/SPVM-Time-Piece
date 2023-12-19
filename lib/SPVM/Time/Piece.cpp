@@ -62,7 +62,6 @@ int32_t SPVM__Time__Piece__strftime(SPVM_ENV* env, SPVM_VALUE* stack) {
     }
     
     if (write_length == 0) {
-      spvm_warn("AAAAA %d %d %d %s %s", write_length, max_length, format_length, ret, format);
       if (max_length > 100 * format_length) {
         return env->die(env, stack, "Too many memory is allocated.", __func__, FILE_NAME, __LINE__);
       }
