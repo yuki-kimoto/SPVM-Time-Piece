@@ -59,4 +59,19 @@ class TestCase::Time::Seconds {
     return 1;
   }
   
+  static method subtract : int () {
+    
+    {
+      my $tsec = Time::Seconds->new(1);
+      
+      my $tsec_subtract = $tsec->subtract(2);
+      
+      unless ($tsec_subtract->seconds == -1) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
 }
