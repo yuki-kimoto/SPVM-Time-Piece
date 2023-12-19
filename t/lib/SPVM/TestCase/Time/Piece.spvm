@@ -525,4 +525,36 @@ class TestCase::Time::Piece {
     return 1;
   }
   
+  static method subtract : int () {
+    
+    {
+      my $tp = Time::Piece->localtime_tp(Time::Piece->strptime("2022-12-13 10:11:56", "%Y-%m-%d %H:%M:%S"));
+      
+      my $tp_subtract = $tp->subtract(Time::Seconds->new(1));
+      
+      unless ($tp_subtract->strftime("%Y-%m-%d %H:%M:%S") eq "2022-12-13 10:11:55") {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method subtract_tp : int () {
+    
+    {
+      my $tp = Time::Piece->localtime_tp(Time::Piece->strptime("2022-12-13 10:11:56", "%Y-%m-%d %H:%M:%S"));
+      
+      my $tp2 = Time::Piece->localtime_tp(Time::Piece->strptime("2022-12-13 10:11:55", "%Y-%m-%d %H:%M:%S"));
+      
+      my $tsec = $tp->subtract_tp($tp2);
+      
+      unless ($tsec->seconds == 1) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
 }
