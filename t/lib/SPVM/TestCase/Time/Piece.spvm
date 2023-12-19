@@ -509,4 +509,20 @@ class TestCase::Time::Piece {
     
     return 1;
   }
+  
+  static method add : int () {
+    
+    {
+      my $tp = Time::Piece->localtime_tp(Time::Piece->strptime("2022-12-13 10:11:56", "%Y-%m-%d %H:%M:%S"));
+      
+      my $tp_add = $tp->add(Time::Seconds->new(1));
+      
+      unless ($tp_add->strftime("%Y-%m-%d %H:%M:%S") eq "2022-12-13 10:11:57") {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
 }

@@ -78,6 +78,10 @@ ok(SPVM::TestCase::Time::Piece->test);
   ok(SPVM::TestCase::Time::Piece->truncate);
 }
 
+{
+  ok(SPVM::TestCase::Time::Piece->add);
+}
+
 # Version check
 {
   my $version_string = SPVM::Fn->get_version_string("Time::Piece");
