@@ -59,6 +59,10 @@ C<static method localtime_tp : L<Time::Piece|SPVM::Time::Piece> ($tp : L<Time::P
 
 C<static method gmtime : L<Time::Piece|SPVM::Time::Piece> ($epoch : long = -1L);>
 
+=head2 gmtime_tp
+
+C<static method gmtime_tp : L<Time::Piece|SPVM::Time::Piece> ($tp : L<Time::Piece|SPVM::Time::Piece>);>
+
 =head2 strptime
 
 C<static method strptime : L<Time::Piece|SPVM::Time::Piece> ($string : string, $format : string);>
