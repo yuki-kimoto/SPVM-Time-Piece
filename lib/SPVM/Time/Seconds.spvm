@@ -6,6 +6,9 @@ class Time::Seconds {
   
   use StringBuffer;
   
+  # Interfaces
+  interface Cloneable;
+  
   # Fields
   has seconds : ro long;
   
@@ -101,9 +104,9 @@ class Time::Seconds {
       $seconds = -$seconds;
       $buffer->push("minus ");
     }
-    if ($seconds >= &ONE_MINUTE) {
-      if ($seconds >= &ONE_HOUR) {
-        if ($seconds >= &ONE_DAY) {
+    if ($seconds >= &ONE_MINUTE->{seconds}) {
+      if ($seconds >= &ONE_HOUR->{seconds}) {
+        if ($seconds >= &ONE_DAY->{seconds}) {
           my $days_floor = (int)$self->days;
           $buffer->push($days_floor);
           unless ($days_floor == 1) {
@@ -111,7 +114,7 @@ class Time::Seconds {
           }
           $buffer->push(" ,");
           
-          $seconds -= ($days_floor * &ONE_DAY);
+          $seconds -= ($days_floor * &ONE_DAY->{seconds});
         }
         my $hours_floor = (int)$self->hours;
         $buffer->push($hours_floor);
@@ -119,7 +122,7 @@ class Time::Seconds {
           $buffer->push("s");
         }
         $buffer->push(" ,");
-        $seconds -= ($hours_floor * &ONE_HOUR);
+        $seconds -= ($hours_floor * &ONE_HOUR->{seconds});
       }
       my $mins_floor = (int)$self->minutes;
       $buffer->push($mins_floor);
@@ -127,7 +130,7 @@ class Time::Seconds {
         $buffer->push("s");
       }
       $buffer->push(" ,");
-      $seconds -= ($mins_floor * &ONE_MINUTE);
+      $seconds -= ($mins_floor * &ONE_MINUTE->{seconds});
     }
     
     $buffer->push($seconds);

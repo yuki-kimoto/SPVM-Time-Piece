@@ -20,6 +20,14 @@ The Time::Piece class in L<SPVM> has methods to manipulate dates and times.
   say "Time is " . $tp->cdate;
   say "Year is " . $tp->year;
 
+=head2 Interfaces
+
+=over 2
+
+=item L<Cloneable|SPVM::Cloneable>
+
+=back
+
 =head1 Fields
 
 =head2 is_localtime

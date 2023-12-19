@@ -29,6 +29,14 @@ The Time::Seconds class in L<SPVM> has methods to manipulate seconds to calculat
 
 The class makes the assumption that there are 24 hours in a day, 7 days in a week, 365.24225 days in a year and 12 months in a year.
 
+=head2 Interfaces
+
+=over 2
+
+=item L<Cloneable|SPVM::Cloneable>
+
+=back
+
 =head1 Fields
 
 =head2 seconds

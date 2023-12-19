@@ -9,6 +9,9 @@ class Time::Piece {
   use Time::Local;
   use Sys::Time::Tm;
   
+  # Interfaces
+  interface Cloneable;
+  
   # Class Variables
   our $DATE_SEP : string;
   our $TIME_SEP : string;
