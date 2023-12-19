@@ -396,14 +396,7 @@ class Time::Piece {
   
   method julian_day : double () {
     
-    my $tm = (Sys::Time::Tm)undef;
-    
-    if ($self->{is_localtime}) {
-      $tm = Sys->gmtime($self->{epoch});
-    }
-    else {
-      $tm = $self->{tm};
-    }
+    my $tm = Sys->gmtime($self->{epoch});
     
     my $jd = $self->_jd($tm);
     
