@@ -4,11 +4,6 @@ class TestCase::Time::Piece {
   use Time::Piece;
   use Format;
   
-  static method test : int () {
-    
-    return 1;
-  }
-  
   static method localtime : int () {
     
     {

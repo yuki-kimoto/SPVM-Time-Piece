@@ -1,0 +1,46 @@
+class TestCase::Time::Seconds {
+  
+  use Sys;
+  use Time::Seconds;
+  
+  static method constant_values : int () {
+    
+    unless (Time::Seconds->ONE_MINUTE->seconds == 60) {
+      return 0;
+    }
+    
+    unless (Time::Seconds->ONE_HOUR->seconds == 3_600) {
+      return 0;
+    }
+    
+    unless (Time::Seconds->ONE_DAY->seconds == 86_400) {
+      return 0;
+    }
+    
+    unless (Time::Seconds->ONE_WEEK->seconds == 604_800) {
+      return 0;
+    }
+    
+    unless (Time::Seconds->ONE_MONTH->seconds == 2_629_744) {
+      return 0;
+    }
+    
+    unless (Time::Seconds->ONE_YEAR->seconds == 31_556_930) {
+      return 0;
+    }
+    
+    unless (Time::Seconds->ONE_FINANCIAL_MONTH->seconds == 2_592_000) {
+      return 0;
+    }
+    
+    unless (Time::Seconds->LEAP_YEAR->seconds == 31_622_400) {
+      return 0;
+    }
+    
+    unless (Time::Seconds->NON_LEAP_YEAR->seconds == 31_536_000) {
+      return 0;
+    }
+    
+    return 1;
+  }
+}
