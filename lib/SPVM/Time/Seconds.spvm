@@ -19,23 +19,23 @@ class Time::Seconds {
     return $self;
   }
   
-  static method ONE_MINUTE : long () { return 60; }
+  static method ONE_MINUTE : Time::Seconds() { return &new(60); }
   
-  static method ONE_HOUR : long () { return 3_600; }
+  static method ONE_HOUR : Time::Seconds () { return &new(3_600); }
   
-  static method ONE_DAY : long () { return 86_400; }
+  static method ONE_DAY : Time::Seconds () { return &new(86_400); }
   
-  static method ONE_WEEK : long () { return 604_800; }
+  static method ONE_WEEK : Time::Seconds () { return &new(604_800); }
   
-  static method ONE_MONTH : long () { return 2_629_744; } # ONE_YEAR / 12
+  static method ONE_MONTH : Time::Seconds () { return &new(2_629_744); } # ONE_YEAR / 12
   
-  static method ONE_YEAR : long () { return 31_556_930; } # 365.24225 days
+  static method ONE_YEAR : Time::Seconds () { return &new(31_556_930); } # 365.24225 days
   
-  static method ONE_FINANCIAL_MONTH : long () { return 2_592_000; } # 30 days
+  static method ONE_FINANCIAL_MONTH : Time::Seconds () { return &new(2_592_000); } # 30 days
   
-  static method LEAP_YEAR : long () { return 31_622_400; } # 366 * ONE_DAY
+  static method LEAP_YEAR : Time::Seconds () { return &new(31_622_400); } # 366 * ONE_DAY
   
-  static method NON_LEAP_YEAR : long () { return 31_536_000; } # 365 * ONE_DAY
+  static method NON_LEAP_YEAR : Time::Seconds () { return &new(31_536_000); } # 365 * ONE_DAY
   
   # Instance Methods
   method add : Time::Seconds ($seconds : long) {
