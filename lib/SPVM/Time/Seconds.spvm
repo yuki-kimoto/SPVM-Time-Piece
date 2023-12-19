@@ -60,10 +60,6 @@ class Time::Seconds {
     $self->{seconds} -= $seconds;
   }
   
-  method copy : Time::Seconds () {
-    return Time::Seconds->new($self->{seconds});
-  }
-  
   method minutes : double () {
     return $self->{seconds} / 60.0;
   }
@@ -93,7 +89,7 @@ class Time::Seconds {
   }
   
   method clone : Time::Seconds () {
-    return $self->copy;
+    return Time::Seconds->new($self->{seconds});
   }
   
   method pretty : string () {
