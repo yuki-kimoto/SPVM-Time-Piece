@@ -48,19 +48,11 @@ class Time::Seconds {
     return Time::Seconds->new($new_seconds);
   }
   
-  method add_to : void ($seconds : long) {
-    $self->{seconds} += $seconds;
-  }
-  
   method subtract : Time::Seconds ($seconds : long) {
     
     my $new_seconds = $self->{seconds} - $seconds;
     
     return Time::Seconds->new($new_seconds);
-  }
-  
-  method subtract_from : void ($seconds : long) {
-    $self->{seconds} -= $seconds;
   }
   
   method minutes : double () {

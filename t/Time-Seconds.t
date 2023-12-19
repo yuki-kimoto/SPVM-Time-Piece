@@ -20,6 +20,11 @@ my $start_memory_blocks_count = $api->get_memory_blocks_count;
   ok(SPVM::TestCase::Time::Seconds->constant_values);
 }
 
+{
+  ok(SPVM::TestCase::Time::Seconds->add);
+}
+
+
 # Version check
 {
   my $version_string = SPVM::Fn->get_version_string("Time::Seconds");

@@ -43,4 +43,20 @@ class TestCase::Time::Seconds {
     
     return 1;
   }
+  
+  static method add : int () {
+    
+    {
+      my $tsec = Time::Seconds->new(1);
+      
+      my $tsec_add = $tsec->add(2);
+      
+      unless ($tsec_add->seconds == 3) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
 }
