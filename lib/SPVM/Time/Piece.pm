@@ -6,7 +6,7 @@ our $VERSION = "0.001";
 
 =head1 Name
 
-SPVM::Time::Piece - Short Description
+SPVM::Time::Piece - Dates and Times
 
 =head1 Description
 
@@ -15,16 +15,11 @@ The Time::Piece class in L<SPVM> has methods to manipulate dates and times.
 =head1 Usage
 
   use Time::Piece;
-  use Time::Seconds;
   
-  my $t = Time::Piece->localtime;
-  $t = $t->add(Time::Seconds->ONE_DAY);
-  
-  my $t2 = Time::Piece->localtime;
-  my $s = $t - $t2;
-  
-  say "Difference is: " . $s->days;
-  
+  my $tp = Time::Piece->localtime;
+  say "Time is " . $tp->cdate;
+  say "Year is " . $tp->year;
+
 =head1 Fields
 
 =head2 is_localtime
