@@ -54,21 +54,59 @@ Seconds from epoch time.
 
 C<static method localtime : L<Time::Piece|SPVM::Time::Piece> ($epoch : long = -1L);>
 
+Creates a L<Time::Piece|SPVM::Time::Piece> object given the epoch time, and returns it.
+
+This instance represents the user's specified timezone.
+
+The L</"epoch">, L</"tm">, and L</"is_localtime"> fields are set to appropriate values.
+
 =head2 localtime_tp
 
 C<static method localtime_tp : L<Time::Piece|SPVM::Time::Piece> ($tp : L<Time::Piece|SPVM::Time::Piece>);>
+
+Creates a L<Time::Piece|SPVM::Time::Piece> object by interpreting $tp as the user's specified timezone, and returns it.
+
+This instance represents the user's specified timezone,
+
+The L</"epoch">, L</"tm">, and L</"is_localtime"> fields are set to appropriate values.
 
 =head2 gmtime
 
 C<static method gmtime : L<Time::Piece|SPVM::Time::Piece> ($epoch : long = -1L);>
 
+Creates a L<Time::Piece|SPVM::Time::Piece> object given the epoch time, and returns it.
+
+This instance represents UTC timezone,
+
+The L</"epoch">, L</"tm">, and L</"is_localtime"> fields are set to appropriate values.
+
 =head2 gmtime_tp
 
 C<static method gmtime_tp : L<Time::Piece|SPVM::Time::Piece> ($tp : L<Time::Piece|SPVM::Time::Piece>);>
 
+Creates a L<Time::Piece|SPVM::Time::Piece> object by interpreting $tp as UTC timezone, and returns it.
+
+This instance represents UTC timezone,
+
+The L</"epoch">, L</"tm">, and L</"is_localtime"> fields are set to appropriate values.
+
 =head2 strptime
 
 C<static method strptime : L<Time::Piece|SPVM::Time::Piece> ($string : string, $format : string);>
+
+Parses the string $string according to the format $format.
+
+This method calls L<std::get_time|https://en.cppreference.com/w/cpp/io/manip/get_time> in C++.
+
+See the L<std::get_time|https://en.cppreference.com/w/cpp/io/manip/get_time> function about input field descriptors such as C<%Y>, C<%m>, C<%d>, C<%H>, C<%M>, C<%S>.
+
+Exceptions:
+
+$string must be defined. Otherwise an exception is thrown.
+
+$format must be defined. Otherwise an exception is thrown.
+
+If std::get_time failed, an exception is thrown.
 
 =head1 Instance Methods
 
@@ -76,25 +114,37 @@ C<static method strptime : L<Time::Piece|SPVM::Time::Piece> ($string : string, $
 
 C<method sec : int ();>
 
+Returns the second. This is the value of L<tm_sec|SPVM::Sys::Time::Tm/"tm_sec"> in the Sys::Time::Tm class.
+
 =head2 second
 
 C<method second : int ();>
+
+The same as the L</"sec"> method.
 
 =head2 min
 
 C<method min : int ();>
 
+Returns the minute. This is the value of L<tm_min|SPVM::Sys::Time::Tm/"tm_min"> in the Sys::Time::Tm class.
+
 =head2 minute
 
 C<method minute : int ();>
+
+The same as the L</"min"> method.
 
 =head2 hour
 
 C<method hour : int ();>
 
+Returns the hour. This is the value of L<tm_hour|SPVM::Sys::Time::Tm/"tm_hour"> in the Sys::Time::Tm class.
+
 =head2 mday
 
 C<method mday : int ();>
+
+Returns the day of the month. This is the value of L<tm_mday|SPVM::Sys::Time::Tm/"tm_mday"> in the Sys::Time::Tm class.
 
 =head2 day_of_month
 
@@ -104,129 +154,211 @@ C<method day_of_month : int ();>
 
 C<method mon : int ();>
 
+Returns the month. This is the value of L<tm_mon|SPVM::Sys::Time::Tm/"tm_mon"> plus 1 in the Sys::Time::Tm class.
+
 =head2 _mon
 
 C<method _mon : int ();>
 
-=head2 month
-
-C<method month : string ($mon_list : string[] = undef);>
+Returns the value of L<tm_mon|SPVM::Sys::Time::Tm/"tm_mon"> in the Sys::Time::Tm class.
 
 =head2 monname
 
 C<method monname : string ($mon_list : string[] = undef);>
 
+Returns the month name given $mon_list.
+
+The default $mon_list:
+
+  ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+
+=head2 month
+
+C<method month : string ($mon_list : string[] = undef);>
+
+The same as the L</"monname"> method.
+
 =head2 fullmonth
 
 C<method fullmonth : string ($mon_list : string[] = undef);>
 
+Returns the full month name given $mon_list.
+
+The default $mon_list:
+
+  ["January", "February", "March", "April", "May", "June", "July", 
+                      "August", "September", "October", "November", "December"]
 =head2 year
 
 C<method year : int ();>
+
+Returns the year. This is the value of L<tm_mday|SPVM::Sys::Time::Tm/"tm_mday"> plus 1900 in the Sys::Time::Tm class.
 
 =head2 _year
 
 C<method _year : int ();>
 
+Returns the value of L<tm_year|SPVM::Sys::Time::Tm/"tm_year"> in the Sys::Time::Tm class.
+
 =head2 yy
 
 C<method yy : int ();>
+
+Returns the the last two digits of L</"year">.
 
 =head2 wday
 
 C<method wday : int ();>
 
+Returns the week number, interpreting Sunday as 1. This is the value of L<tm_wday|SPVM::Sys::Time::Tm/"tm_wday"> plus 1 in the Sys::Time::Tm class.
+
 =head2 _wday
 
 C<method _wday : int ();>
+
+The same as the L</"day_of_week"> method.
 
 =head2 day_of_week
 
 C<method day_of_week : int ();>
 
+Returns the week number, interpreting Sunday as 0. This is the value of L<tm_wday|SPVM::Sys::Time::Tm/"tm_wday"> in the Sys::Time::Tm class.
+
 =head2 wdayname
 
 C<method wdayname : string ($day_list : string[] = undef);>
+
+Returns the name of the day of the week given $day_list.
+
+The default $day_list:
+
+  ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
 
 =head2 day
 
 C<method day : string ($day_list : string[] = undef);>
 
+The same as the L</"wdayname"> method.
+
 =head2 fullday
 
 C<method fullday : string ($day_list : string[] = undef);>
+
+Returns the full name of the day of the week given $day_list.
+
+The default $day_list:
+
+  ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 
 =head2 yday
 
 C<method yday : int ();>
 
+Returns the day in the year. This is the value of L<tm_yday|SPVM::Sys::Time::Tm/"tm_yday"> in the Sys::Time::Tm class.
+
 =head2 day_of_year
 
 C<method day_of_year : int ();>
+
+The same as the L</"yday"> method.
 
 =head2 isdst
 
 C<method isdst : int ();>
 
+Returns the flag thats indicate daylight saving time. This is the value of L<tm_isdst|SPVM::Sys::Time::Tm/"tm_isdst"> in the Sys::Time::Tm class.
+
 =head2 daylight_savings
 
 C<method daylight_savings : int ();>
 
-=head2 tzoffset
-
-C<method tzoffset : L<Time::Seconds|SPVM::Time::Seconds> ();>
+The same as the L</"isdst"> method.
 
 =head2 hms
 
 C<method hms : string ($sep : string = undef);>
 
+Formats the hour, the minute, and the second into a two-digit string respectively, and concatenates them with the given separator $sep, and returns it.
+
+If $sep is not defined, $sep is set to C<:>.
+
 =head2 time
 
 C<method time : string ($sep : string = undef);>
+
+The same as the L</"hms"> method.
 
 =head2 ymd
 
 C<method ymd : string ($sep : string = undef);>
 
+Formats the year, the month, and the day of the month into a four-digit string, a two-digit string, a two-digit string respectively, and concatenates them with the given separator $sep, and returns it.
+
+If $sep is not defined, $sep is set to C<->.
+
 =head2 date
 
 C<method date : string ($sep : string = undef);>
+
+The same as the L</"ymd"> method.
 
 =head2 mdy
 
 C<method mdy : string ($sep : string = undef);>
 
+Formats the month, the day of the month, and the year into a two-digit string, a two-digit string, a four-digit string respectively, and concatenates them with the given separator $sep, and returns it.
+
+If $sep is not defined, $sep is set to C<->.
+
 =head2 dmy
 
 C<method dmy : string ($sep : string = undef);>
+
+Formats the day of the month, the month, and the year into a two-digit string, a two-digit string, a four-digit string respectively, and concatenates them with the given separator $sep, and returns it.
+
+If $sep is not defined, $sep is set to C<->.
 
 =head2 datetime
 
 C<method datetime : string ();>
 
+Formats the time information into ISO 8601 format like C<2000-02-29T12:34:56>, and returns it.
+
+=head2 tzoffset
+
+C<method tzoffset : L<Time::Seconds|SPVM::Time::Seconds> ();>
+
+Calculates the timezone offset, and returns it.
+
 =head2 julian_day
 
 C<method julian_day : double ();>
+
+Calculates the number of days since Julian period began, and returns it.
 
 =head2 mjd
 
 C<method mjd : double ();>
 
-=head2 _jd
-
-C<method _jd : double ($tm : L<Sys::Time::Tm|SPVM::Sys::Time::Tm>);>
+Calculates the modified Julian date (JD minus 2400000.5 days).
 
 =head2 week
 
 C<method week : int ();>
 
-=head2 
+Calculate the week number (ISO 8601), and returns it.
+
+=head2 is_leap_year
 
 C<method is_leap_year : int ();>
+
+If the year is a leap year, returns 1, otherwise returns 0.
 
 =head2 month_last_day
 
 C<method month_last_day : int ();>
+
+Returns the last day of the month.
 
 =head2 strftime
 
