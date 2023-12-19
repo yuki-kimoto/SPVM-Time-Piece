@@ -6,6 +6,7 @@
 #include <time.h>
 #include <sstream>
 #include <iomanip>
+#include <errno.h>
 
 extern "C" {
 
@@ -52,9 +53,16 @@ int32_t SPVM__Time__Piece__strftime(SPVM_ENV* env, SPVM_VALUE* stack) {
     
     char* ret = (char*)env->get_chars(env, stack, obj_ret);
     
+    errno = 0;
     int32_t write_length = strftime(ret, max_length, format, st_tm);
     
+    if (!(errno == 0)) {
+      env->die(env, stack, "[System Error]strftime failed:%s. $format is \"%s\"", env->strerror(env, stack, errno, 0), format, __func__, FILE_NAME, __LINE__);
+      return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_SYSTEM_CLASS;
+    }
+    
     if (write_length == 0) {
+      spvm_warn("AAAAA %d %d %d %s %s", write_length, max_length, format_length, ret, format);
       if (max_length > 100 * format_length) {
         return env->die(env, stack, "Too many memory is allocated.", __func__, FILE_NAME, __LINE__);
       }
