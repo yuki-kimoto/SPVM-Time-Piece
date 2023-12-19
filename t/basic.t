@@ -90,6 +90,10 @@ ok(SPVM::TestCase::Time::Piece->test);
   ok(SPVM::TestCase::Time::Piece->subtract_tp);
 }
 
+{
+  ok(SPVM::TestCase::Time::Piece->compare);
+}
+
 # Version check
 {
   my $version_string = SPVM::Fn->get_version_string("Time::Piece");

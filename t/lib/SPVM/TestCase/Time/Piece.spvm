@@ -557,4 +557,29 @@ class TestCase::Time::Piece {
     return 1;
   }
   
+  static method compare : int () {
+    
+    {
+      my $tp = Time::Piece->localtime_tp(Time::Piece->strptime("2022-12-13 10:11:56", "%Y-%m-%d %H:%M:%S"));
+      
+      my $tp2 = Time::Piece->localtime_tp(Time::Piece->strptime("2022-12-13 10:11:55", "%Y-%m-%d %H:%M:%S"));
+      
+      my $tp3 = Time::Piece->localtime_tp(Time::Piece->strptime("2022-12-13 10:11:57", "%Y-%m-%d %H:%M:%S"));
+      
+      unless ($tp->compare($tp) == 0) {
+        return 0;
+      }
+      
+      unless ($tp->compare($tp2) == 1) {
+        return 0;
+      }
+      
+      unless ($tp->compare($tp3) == -1) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
 }

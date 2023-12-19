@@ -541,30 +541,16 @@ class Time::Piece {
       $final_month = $final_month % 12;
     }
     
-    my $current_tm = $self->{tm};
+    my $new_tp = $self->clone;
     
-    my $ret_tm = Sys->gmtime(0);
+    $new_tp->{tm}->set_tm_mon($final_month);
+    $new_tp->{tm}->set_tm_year($self->{tm}->tm_year + $num_years);
     
-    $ret_tm->set_tm_sec($current_tm->tm_sec);
-    $ret_tm->set_tm_min($current_tm->tm_min);
-    $ret_tm->set_tm_hour($current_tm->tm_hour);
-    $ret_tm->set_tm_mday($current_tm->tm_mday);
-    $ret_tm->set_tm_mon($final_month);
-    $ret_tm->set_tm_year( $current_tm->tm_year - 1900 + $num_years);
-    
-    my $ret_epoch = 0L;
-    if ($self->{is_localtime}) {
-      $ret_epoch = Time::Local->timelocal($ret_tm);
-    }
-    else {
-      $ret_epoch = Time::Local->timegm($ret_tm);
-    }
-    
-    return &new($ret_epoch, $self->{is_localtime});
+    return $new_tp;
   }
   
   method add_years : Time::Piece ($years : int) {
-    $self->add_months($years * 12);
+    return $self->add_months($years * 12);
   }
   
   method truncate : Time::Piece ($options : object[]) {
