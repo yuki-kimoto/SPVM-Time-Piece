@@ -54,7 +54,7 @@ Seconds from epoch time.
 
 C<static method localtime : L<Time::Piece|SPVM::Time::Piece> ($epoch : long = -1L);>
 
-Creates a L<Time::Piece|SPVM::Time::Piece> object given the epoch time, and returns it.
+Creates a bew L<Time::Piece|SPVM::Time::Piece> object given the epoch time, and returns it.
 
 This instance represents the user's specified timezone.
 
@@ -64,7 +64,7 @@ The L</"epoch">, L</"tm">, and L</"is_localtime"> fields are set to appropriate 
 
 C<static method localtime_tp : L<Time::Piece|SPVM::Time::Piece> ($tp : L<Time::Piece|SPVM::Time::Piece>);>
 
-Creates a L<Time::Piece|SPVM::Time::Piece> object by interpreting $tp as the user's specified timezone, and returns it.
+Creates a new L<Time::Piece|SPVM::Time::Piece> object by interpreting $tp as the user's specified timezone, and returns it.
 
 This instance represents the user's specified timezone,
 
@@ -74,7 +74,7 @@ The L</"epoch">, L</"tm">, and L</"is_localtime"> fields are set to appropriate 
 
 C<static method gmtime : L<Time::Piece|SPVM::Time::Piece> ($epoch : long = -1L);>
 
-Creates a L<Time::Piece|SPVM::Time::Piece> object given the epoch time, and returns it.
+Creates a new L<Time::Piece|SPVM::Time::Piece> object given the epoch time, and returns it.
 
 This instance represents UTC timezone,
 
@@ -84,7 +84,7 @@ The L</"epoch">, L</"tm">, and L</"is_localtime"> fields are set to appropriate 
 
 C<static method gmtime_tp : L<Time::Piece|SPVM::Time::Piece> ($tp : L<Time::Piece|SPVM::Time::Piece>);>
 
-Creates a L<Time::Piece|SPVM::Time::Piece> object by interpreting $tp as UTC timezone, and returns it.
+Creates a new L<Time::Piece|SPVM::Time::Piece> object by interpreting $tp as UTC timezone, and returns it.
 
 This instance represents UTC timezone,
 
@@ -360,41 +360,93 @@ C<method month_last_day : int ();>
 
 Returns the last day of the month.
 
+=head2 cdate
+
+C<method cdate : string ();>
+
+Formats the time information into the string like C<Tue Feb 29 12:34:56 2000>.
+
 =head2 strftime
 
 C<method method strftime : string ($format : string = undef);>
 
-=head2 cdate
+Formats the time information into a string according to the format $format, and returns it.
 
-C<method cdate : string ();>
+See the L<strftime|https://linux.die.net/man/3/strftime> function about conversion specifications such as C<%Y>, C<%m>, C<%d>, C<%H>, C<%M>, C<%S>.
+
+If $format is not defined, it is set to C<%a, %d %b %Y %H:%M:%S %Z>.
+
+Exceptions:
+
+The length of $format must be greater than 1. Otherwise an exception is thrown.
+
+If too many memory is allocated, an exception is thrown.
 
 =head2 add
 
 C<method add : L<Time::Piece|SPVM::Time::Piece> ($tsec : L<Time::Seconds|SPVM::Time::Seconds>);>
 
+Creates a new L<Time::Piece|SPVM::Time::Piece> object with the given seconds $tsec added, and returns it.
+
 =head2 subtract
 
 C<method subtract : L<Time::Piece|SPVM::Time::Piece> ($tsec : L<Time::Seconds|SPVM::Time::Seconds>);>
+
+Creates a new L<Time::Piece|SPVM::Time::Piece> object with the given seconds $tsec subtracted, and returns it.
+
+=head2 subtract_tp
+
+C<method subtract_tp : L<Time::Seconds|SPVM::Time::Seconds> ($tp : L<Time::Piece|SPVM::Time::Piece>);>
+
+Creates a new L<Time::Seconds|SPVM::Time::Seconds> object given the seconds that is L</"seconds"> fields to the L</"epoch"> field of this instance munus the L</"epoch"> field of $tp.
 
 =head2 compare
 
 C<method compare : int ($tp : L<Time::Piece|SPVM::Time::Piece>);>
 
+If the L</"epoch"> field of this instance is greater than the L</"epoch"> field of $tp, returns 1.
+
+If the L</"epoch"> field of this instance is less than the L</"epoch"> field of $tp, returns -1.
+
+If the L</"epoch"> field of this instance is equal to the L</"epoch"> field of $tp, returns 0.
+
 =head2 add_months
 
 C<method add_months : L<Time::Piece|SPVM::Time::Piece> ($num_months : int);>
+
+Returns a new L<Time::Piece|SPVM::Time::Piece> object with the month added by $num_months.
 
 =head2 add_years
 
 C<method add_years : L<Time::Piece|SPVM::Time::Piece> ($years : int);>
 
+Returns a new L<Time::Piece|SPVM::Time::Piece> object with the year added by $years.
+
 =head2 truncate
 
 C<method truncate : L<Time::Piece|SPVM::Time::Piece> ($options : object[]);>
 
+Calling the truncate method returns a copy of the object but with the time truncated to the start of the supplied unit C<to>.
+
+Options:
+
+=over 2
+
+=item C<to> : string
+
+"year", "quarter", "month", "day", "hour", "minute", and "second".
+
+=back
+
+Excamples:
+
+  $tp = $tp->truncate({to => "day"});
+
 =head2 clone
 
 C<method clone : L<Time::Piece|SPVM::Time::Piece> ();>
+
+Clones this instance, and returns it.
 
 =head1 Repository
 

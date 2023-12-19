@@ -21,7 +21,7 @@ The Time::Seconds class in L<SPVM> has methods to manipulate seconds to calculat
   $tp = $tp->add(Time::Seconds->ONE_DAY);
   
   my $tp2 = Time::Piece->localtime;
-  my $tsec = $tp - $tp2;
+  my $tsec = $tp->subtract_tp($tp2);
   
   say "Difference is: " . $tsec->days;
 

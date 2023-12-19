@@ -513,15 +513,16 @@ class Time::Piece {
     return &new($self->{epoch} - (long)$tsec->{seconds}, $self->{is_localtime});
   }
   
+  method subtract_tp : Time::Seconds ($tp :Time::Piece) {
+    
+    return Time::Seconds->new($self->{epoch} - $tp->{epoch});
+  }
+  
   method compare : int ($tp : Time::Piece) {
     return $self->{epoch} <=> $tp->epoch;
   }
   
   method add_months : Time::Piece ($num_months : int) {
-    
-    unless ($num_months) {
-      die "\$num_months must be defined.";
-    }
     
     my $final_month = $self->_mon + $num_months;
     my $num_years = 0;

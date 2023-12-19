@@ -29,6 +29,12 @@ int32_t SPVM__Time__Piece__strftime(SPVM_ENV* env, SPVM_VALUE* stack) {
     obj_format = env->new_string(env, stack, format, strlen(format));
   }
   
+  int32_t format_length = env->length(env, stack, obj_format);
+  
+  if (format_length == 0) {
+    return env->die(env, stack, "The length of $format must be greater than 1.", __func__, FILE_NAME, __LINE__);
+  }
+  
   const char* format = env->get_chars(env, stack, obj_format);
   
   void* obj_tm = env->get_field_object_by_name(env, stack, obj_self, "tm", &error_id, __func__, FILE_NAME, __LINE__);
@@ -36,17 +42,30 @@ int32_t SPVM__Time__Piece__strftime(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   struct tm* st_tm = (struct tm*)env->get_pointer(env, stack, obj_tm);
   
-  int32_t ret_length = 128;
+  int32_t max_length = format_length + 160;
   
-  void* obj_ret = env->new_string(env, stack, NULL, ret_length);
+  void* obj_ret = NULL;
   
-  char* ret = (char*)env->get_chars(env, stack, obj_ret);
-  
-  strftime(ret, ret_length, format, st_tm);
-  
-  int32_t write_length = strlen(ret);
-  
-  env->shorten(env, stack, obj_ret, write_length);
+  while (1) {
+    
+    obj_ret = env->new_string(env, stack, NULL, max_length);
+    
+    char* ret = (char*)env->get_chars(env, stack, obj_ret);
+    
+    int32_t write_length = strftime(ret, max_length, format, st_tm);
+    
+    if (write_length == 0) {
+      if (max_length > 100 * format_length) {
+        return env->die(env, stack, "Too many memory is allocated.", __func__, FILE_NAME, __LINE__);
+      }
+      
+      max_length *= 2;
+    }
+    else {
+      env->shorten(env, stack, obj_ret, write_length);
+      break;
+    }
+  }
   
   stack[0].oval = obj_ret;
   
