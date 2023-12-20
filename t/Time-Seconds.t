@@ -28,6 +28,10 @@ my $start_memory_blocks_count = $api->get_memory_blocks_count;
   ok(SPVM::TestCase::Time::Seconds->subtract);
 }
 
+{
+  ok(SPVM::TestCase::Time::Seconds->unit_methods);
+}
+
 
 # Version check
 {
