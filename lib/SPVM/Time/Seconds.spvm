@@ -88,45 +88,57 @@ class Time::Seconds {
   }
   
   method pretty : string () {
-    my $seconds = $self->{seconds};
+    my $tsec_clone = $self->clone;
     
     my $buffer = StringBuffer->new;
     
-    if ($seconds < 0) {
-      $seconds = -$seconds;
+    if ($tsec_clone->{seconds} < 0) {
+      $tsec_clone->{seconds} = -$tsec_clone->{seconds};
       $buffer->push("minus ");
     }
-    if ($seconds >= &ONE_MINUTE->{seconds}) {
-      if ($seconds >= &ONE_HOUR->{seconds}) {
-        if ($seconds >= &ONE_DAY->{seconds}) {
-          my $days_floor = (int)$self->days;
+    if ($tsec_clone->{seconds} >= &ONE_MINUTE->{seconds}) {
+      if ($tsec_clone->{seconds} >= &ONE_HOUR->{seconds}) {
+        if ($tsec_clone->{seconds} >= &ONE_DAY->{seconds}) {
+          my $days_floor = (int)$tsec_clone->days;
           $buffer->push($days_floor);
+          
+          $buffer->push(" day");
+          
           unless ($days_floor == 1) {
             $buffer->push("s");
           }
-          $buffer->push(" ,");
+          $buffer->push(", ");
           
-          $seconds -= ($days_floor * &ONE_DAY->{seconds});
+          $tsec_clone->{seconds} -= ($days_floor * &ONE_DAY->{seconds});
         }
-        my $hours_floor = (int)$self->hours;
+        my $hours_floor = (int)$tsec_clone->hours;
         $buffer->push($hours_floor);
+        
+        $buffer->push(" hour");
+        
         unless ($hours_floor == 1) {
           $buffer->push("s");
         }
-        $buffer->push(" ,");
-        $seconds -= ($hours_floor * &ONE_HOUR->{seconds});
+        $buffer->push(", ");
+        $tsec_clone->{seconds} -= ($hours_floor * &ONE_HOUR->{seconds});
       }
-      my $mins_floor = (int)$self->minutes;
+      my $mins_floor = (int)$tsec_clone->minutes;
       $buffer->push($mins_floor);
+      
+      $buffer->push(" minute");
+      
       unless ($mins_floor == 1) {
         $buffer->push("s");
       }
-      $buffer->push(" ,");
-      $seconds -= ($mins_floor * &ONE_MINUTE->{seconds});
+      $buffer->push(", ");
+      $tsec_clone->{seconds} -= ($mins_floor * &ONE_MINUTE->{seconds});
     }
     
-    $buffer->push($seconds);
-    unless ($seconds == 1) {
+    $buffer->push($tsec_clone->{seconds});
+    
+    $buffer->push(" second");
+    
+    unless ($tsec_clone->{seconds} == 1) {
       $buffer->push("s");
     }
     

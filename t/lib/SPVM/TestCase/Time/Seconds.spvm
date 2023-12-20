@@ -195,4 +195,21 @@ class TestCase::Time::Seconds {
     
     return 1;
   }
+  
+  static method pretty : int () {
+    
+    {
+      my $tsec = Time::Seconds->new(60 * 60 * 24 * 366 * 3 + 13456);
+      
+      my $pretty = $tsec->pretty;
+      
+      unless ($pretty eq "1098 days, 3 hours, 44 minutes, 16 seconds") {
+        return 0;
+      }
+      
+    }
+    
+    return 1;
+  }
+  
 }
