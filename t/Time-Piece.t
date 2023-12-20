@@ -92,6 +92,14 @@ my $start_memory_blocks_count = $api->get_memory_blocks_count;
   ok(SPVM::TestCase::Time::Piece->compare);
 }
 
+{
+  ok(SPVM::TestCase::Time::Piece->add_months);
+}
+
+{
+  ok(SPVM::TestCase::Time::Piece->add_years);
+}
+
 # Version check
 {
   my $version_string = SPVM::Fn->get_version_string("Time::Piece");
