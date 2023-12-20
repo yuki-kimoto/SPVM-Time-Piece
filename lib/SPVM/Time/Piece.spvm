@@ -532,6 +532,11 @@ class Time::Piece {
       }
       
       $final_month = $final_month % 12;
+      
+      # TODO: This is for SPVM bug.
+      if ($final_month < 0) {
+        $final_month += 12;
+      }
     }
     
     my $new_tp = $self->clone;
