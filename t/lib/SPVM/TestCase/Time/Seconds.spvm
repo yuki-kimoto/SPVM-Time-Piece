@@ -182,4 +182,17 @@ class TestCase::Time::Seconds {
     
     return 1;
   }
+  
+  static method clone : int () {
+    
+    {
+      my $tsec_clone = Time::Seconds->new(60)->clone;
+      
+      unless ($tsec_clone->seconds == 60) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
 }
