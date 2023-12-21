@@ -3,6 +3,7 @@ class TestCase::Time::Piece {
   use Sys;
   use Time::Piece;
   use Format;
+  use Array;
   
   static method localtime : int () {
     
@@ -285,29 +286,6 @@ class TestCase::Time::Piece {
     return 1;
   }
   
-  static method repeat_array : string[] ($strings : string[], $count : int) {
-    
-    unless ($strings) {
-      die "\$string must be defined.";
-    }
-    
-    unless ($count >= 0) {
-      die "\$repeat count must be greater than or equal to 0.";
-    }
-    
-    my $string_list = StringList->new;
-    
-    for (my $i = 0; $i < $count; $i++) {
-      for my $string (@$strings) {
-        $string_list->push($string);
-      }
-    }
-    
-    my $repeat_array = $string_list->to_array;
-    
-    return $repeat_array;
-  }
-  
   static method strftime : int () {
     {
       my $tp = Time::Piece->strptime("2022-12-13 10:11:56", "%Y-%m-%d %H:%M:%S");
@@ -323,9 +301,9 @@ class TestCase::Time::Piece {
     {
       my $tp = Time::Piece->strptime("2022-12-13 10:11:56", "%Y-%m-%d %H:%M:%S");
       
-      my $format = Fn->join(" ", &repeat_array(["%Y"], 50));
+      my $format = Fn->join(" ", Array->repeat_string(["%Y"], 50));
       
-      my $expected = Fn->join(" ", &repeat_array(["2022"], 50));
+      my $expected = Fn->join(" ", Array->repeat_string(["2022"], 50));
       
       my $output = $tp->strftime($format);
       
