@@ -65,7 +65,7 @@ class Time::Piece {
     return $new_tp;
   }
   
-  static method localtime : Time::Piece ($epoch : long = -1L) {
+  static method localtime : Time::Piece ($epoch : long = -1) {
     
     my $new_tp = &new($epoch, 1);
     
@@ -99,7 +99,7 @@ class Time::Piece {
     return $new_tp;
   }
   
-  static method gmtime : Time::Piece ($epoch : long = -1L) {
+  static method gmtime : Time::Piece ($epoch : long = -1) {
     
     my $new_tp = &new($epoch, 0);
     
