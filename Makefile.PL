@@ -18,7 +18,7 @@ unless ($meta) {
   # Do something such as environment check.
 }
 
-my %configure_and_runtime_requires = ('SPVM' => '0.989063');
+my %configure_and_runtime_requires = ('SPVM' => '0.989064');
 WriteMakefile(
   NAME => 'SPVM::Time::Piece',
   VERSION_FROM => 'lib/SPVM/Time/Piece.pm',
