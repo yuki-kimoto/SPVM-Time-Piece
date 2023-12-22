@@ -40,10 +40,12 @@ class Time::Piece {
   }
   
   # Class Methods
-  private static method new : Time::Piece ($epoch : long = -1L, $is_localtime : int = 0) {
+  private static method new : Time::Piece ($epoch : long = -1, $is_localtime : int = 0, $allow_minus : int = 0) {
     
-    if ($epoch < 0) {
-      $epoch = Sys->time;
+    unless ($allow_minus) {
+      if ($epoch < 0) {
+        $epoch = Sys->time;
+      }
     }
     
     my $new_tp = new Time::Piece;
@@ -65,9 +67,9 @@ class Time::Piece {
     return $new_tp;
   }
   
-  static method localtime : Time::Piece ($epoch : long = -1) {
+  static method localtime : Time::Piece ($epoch : long = -1, $allow_minus :int = 0) {
     
-    my $new_tp = &new($epoch, 1);
+    my $new_tp = &new($epoch, 1, $allow_minus);
     
     return $new_tp;
   }
@@ -99,9 +101,9 @@ class Time::Piece {
     return $new_tp;
   }
   
-  static method gmtime : Time::Piece ($epoch : long = -1) {
+  static method gmtime : Time::Piece ($epoch : long = -1, $allow_minus : int = 0) {
     
-    my $new_tp = &new($epoch, 0);
+    my $new_tp = &new($epoch, 0, $allow_minus);
     
     return $new_tp;
   }

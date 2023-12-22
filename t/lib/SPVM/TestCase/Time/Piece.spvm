@@ -2,17 +2,40 @@ class TestCase::Time::Piece {
   
   use Sys;
   use Time::Piece;
+  use Time::Seconds;
   use Format;
   use Array;
   
   static method localtime : int () {
     
     {
-      my $tp = Time::Piece->localtime;
+      my $tp = Time::Piece->localtime(0);
+      
+      warn "[Test Output]localtime::" . $tp->cdate;
+      
+      unless (Fn->contains($tp->cdate, "1970")) {
+        return 0;
+      }
     }
     
     {
-      my $tp = Time::Piece->localtime(Sys->time);
+      my $tp = Time::Piece->localtime;
+      
+      warn "[Test Output]localtime:no_args:" . $tp->cdate;
+      
+      unless ($tp->epoch > 0) {
+        return 0;
+      }
+    }
+    
+    {
+      my $tp = Time::Piece->localtime(-(Time::Seconds->ONE_DAY->seconds * 2), 1);
+      
+      warn "[Test Output]localtime:allow_minus:" . $tp->cdate;
+      
+      unless (Fn->contains($tp->cdate, "1969")) {
+        return 0;
+      }
     }
     
     return 1;
@@ -21,11 +44,33 @@ class TestCase::Time::Piece {
   static method gmtime : int () {
     
     {
-      my $tp = Time::Piece->gmtime;
+      my $tp = Time::Piece->gmtime(0);
+      
+      warn "[Test Output]gmtime::" . $tp->cdate;
+      
+      unless (Fn->contains($tp->cdate, "1970")) {
+        return 0;
+      }
     }
     
     {
-      my $tp = Time::Piece->gmtime(Sys->time);
+      my $tp = Time::Piece->gmtime;
+      
+      warn "[Test Output]gmtime:no_args:" . $tp->cdate;
+      
+      unless ($tp->epoch > 0) {
+        return 0;
+      }
+    }
+    
+    {
+      my $tp = Time::Piece->gmtime(-(Time::Seconds->ONE_DAY->seconds * 2), 1);
+      
+      warn "[Test Output]gmtime:allow_minus:" . $tp->cdate;
+      
+      unless (Fn->contains($tp->cdate, "1969")) {
+        return 0;
+      }
     }
     
     return 1;

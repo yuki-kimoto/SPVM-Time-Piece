@@ -52,11 +52,13 @@ Seconds from epoch time.
 
 =head2 localtime
 
-C<static method localtime : L<Time::Piece|SPVM::Time::Piece> ($epoch : long = -1L);>
+C<static method localtime : L<Time::Piece|SPVM::Time::Piece> ($epoch : long = -1, $allow_minus : int = 0);>
 
 Creates a bew L<Time::Piece|SPVM::Time::Piece> object given the epoch time, and returns it.
 
 This instance represents the user's specified timezone.
+
+If $allow_minus is 0 and $epoch is less than 0, $epoch is set to the current epoch time.
 
 The L</"epoch">, L</"tm">, and L</"is_localtime"> fields are set to appropriate values.
 
@@ -72,11 +74,13 @@ The L</"epoch">, L</"tm">, and L</"is_localtime"> fields are set to appropriate 
 
 =head2 gmtime
 
-C<static method gmtime : L<Time::Piece|SPVM::Time::Piece> ($epoch : long = -1L);>
+C<static method gmtime : L<Time::Piece|SPVM::Time::Piece> ($epoch : long = -1, $allow_minus : int = 0);>
 
 Creates a new L<Time::Piece|SPVM::Time::Piece> object given the epoch time, and returns it.
 
 This instance represents UTC timezone,
+
+If $allow_minus is 0 and $epoch is less than 0, $epoch is set to the current epoch time.
 
 The L</"epoch">, L</"tm">, and L</"is_localtime"> fields are set to appropriate values.
 
