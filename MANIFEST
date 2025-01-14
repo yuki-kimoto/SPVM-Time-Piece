@@ -8,8 +8,6 @@
 Changes
 lib/SPVM/Time/Piece.config
 lib/SPVM/Time/Piece.cpp
-lib/SPVM/Time/Piece.native/include/.gitkeep
-lib/SPVM/Time/Piece.native/src/.gitkeep
 lib/SPVM/Time/Piece.pm
 lib/SPVM/Time/Piece.spvm
 lib/SPVM/Time/Seconds.pm
